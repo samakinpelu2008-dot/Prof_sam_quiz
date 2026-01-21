@@ -16,18 +16,13 @@
   }
 
   .container {
-    width: 960px;
-    max-width: 960px;
+    width: 960px; /* fixed width, unadjustable */
     padding: 20px;
   }
 
-  h1 {
-    text-align: center;
-    color: #fff;
-    margin-bottom: 30px;
-  }
+  h1 { text-align: center; color: #fff; margin-bottom: 30px; }
 
-  /* MODE SELECTION GRID */
+  /* MODE GRID */
   .mode-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -110,21 +105,21 @@
 
   <h1>📘 Quiz App</h1>
 
-  <!-- MODE SELECTION -->
+  <!-- MODE SELECTION GRID -->
   <div class="mode-grid" id="modeBox">
-    <div class="mode-card" onclick="startQuiz('read')">
+    <div class="mode-card" onclick="handleModeClick('read')">
       <h2>📖 Read Mode</h2>
       <p>Study questions with answers highlighted</p>
     </div>
-    <div class="mode-card" onclick="startQuiz('all')">
+    <div class="mode-card" onclick="handleModeClick('all')">
       <h2>📝 Solve All</h2>
       <p>Attempt all questions in order</p>
     </div>
-    <div class="mode-card" onclick="startQuiz('random15')">
+    <div class="mode-card" onclick="handleModeClick('random15')">
       <h2>⏱ Random 15</h2>
       <p>15 random questions, timed</p>
     </div>
-    <div class="mode-card" onclick="startQuiz('random30')">
+    <div class="mode-card" onclick="handleModeClick('random30')">
       <h2>⏱ Random 30</h2>
       <p>30 random questions, timed</p>
     </div>
@@ -147,8 +142,40 @@
 
 <script src="questions.js"></script>
 <script>
-let mode = "", quizQuestions = [], index = 0, answers = {}, timeLeft = 0, timerInterval = null;
+let mode="", quizQuestions=[], index=0, answers={}, timeLeft=0, timerInterval=null;
 
+// TEMP REDIRECT URL for testing
+const REDIRECT_URL = "https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce";
+
+function handleModeClick(selectedMode){
+  const lastRedirect = localStorage.getItem("lastRedirect") || 0;
+  const now = Date.now();
+
+  if(now - lastRedirect > 12*60*60*1000){ // 12 hours
+    // store selected mode to resume after redirect
+    localStorage.setItem("selectedModeAfterRedirect", selectedMode);
+
+    // update timestamp to prevent multiple redirects
+    localStorage.setItem("lastRedirect", now);
+
+    // redirect to temporary URL
+    window.location.href = REDIRECT_URL;
+    return;
+  }
+
+  startQuiz(selectedMode);
+}
+
+// resume quiz automatically if returning from redirect
+window.addEventListener("DOMContentLoaded", ()=>{
+  const resumedMode = localStorage.getItem("selectedModeAfterRedirect");
+  if(resumedMode){
+    localStorage.removeItem("selectedModeAfterRedirect");
+    startQuiz(resumedMode);
+  }
+});
+
+// QUIZ ENGINE
 function startQuiz(selectedMode){
   mode = selectedMode; index=0; answers={};
 
