@@ -6,91 +6,85 @@
 <title>Ultimate Biology Quiz</title>
 <style>
   body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background: #6a1b9a; /* Purple background */
+    margin: 0;
+    background: #f0e6ff;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    color: white;
   }
 
   header {
     width: 100%;
+    background: #6a0dad;
+    color: white;
+    padding: 1rem;
     text-align: center;
-    padding: 1.5rem 0;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
-    background: #4a148c;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 
-  .home-container {
+  .card-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 2rem;
-    margin-top: 3rem;
+    margin: 2rem 0;
+    gap: 1rem;
   }
 
-  .card {
+  .mode-card {
     width: 200px;
-    height: 180px;
-    border-radius: 20px;
+    height: 120px;
+    background: #b19cd9;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
     text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 15px;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-    padding: 1rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  .mode-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   }
 
-  .card-15 { background: #ff4081; }  /* pink */
-  .card-30 { background: #ffb74d; }  /* orange */
-  .card-all { background: #4db6ac; }  /* teal */
-  .card-read { background: #7986cb; } /* blue */
-
-  #quiz-container, #result-container {
-    display: none;
+  #quiz-card, #result-card {
     width: 90%;
     max-width: 900px;
-    background: #ffffff;
-    color: black;
-    margin-top: 2rem;
     padding: 2rem;
+    background: white;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: none;
   }
 
   #question-text {
     font-size: 1.3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .option-btn {
     display: block;
     width: 100%;
     text-align: left;
-    padding: 0.8rem 1rem;
+    padding: 1rem;
     margin: 0.5rem 0;
-    border: 2px solid #4a148c;
+    border: 2px solid #6a0dad;
     border-radius: 10px;
     background: white;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 1rem;
   }
 
-  .option-btn:hover { background: #f1f1f1; }
+  .option-btn:hover {
+    background: #f1f1f1;
+  }
 
   .correct { background: #28a745 !important; color: white; }
   .wrong { background: #dc3545 !important; color: white; }
@@ -98,7 +92,9 @@
   .btn-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .btn {
@@ -108,17 +104,16 @@
     cursor: pointer;
     font-size: 1rem;
     color: white;
-    background: #4a148c;
+    background: #6a0dad;
     transition: 0.3s;
   }
 
-  .btn:hover { background: #6a1b9a; }
+  .btn:hover { background: #4b0082; }
 
   #timer {
     font-size: 1.2rem;
     margin-bottom: 1rem;
     color: #333;
-    text-align: right;
   }
 
   #result {
@@ -131,16 +126,14 @@
 
 <header>Ultimate Biology Quiz</header>
 
-<!-- Home / Mode Selection -->
-<div class="home-container">
-  <div class="card card-15" onclick="startQuiz('15')">15 Questions</div>
-  <div class="card card-30" onclick="startQuiz('30')">30 Questions</div>
-  <div class="card card-all" onclick="startQuiz('all')">All Questions</div>
-  <div class="card card-read" onclick="startReadMode()">Read Mode</div>
+<div class="card-container" id="home-cards">
+  <div class="mode-card" onclick="startQuiz('15')">15 Questions</div>
+  <div class="mode-card" onclick="startQuiz('30')">30 Questions</div>
+  <div class="mode-card" onclick="startQuiz('all')">All Questions</div>
+  <div class="mode-card" onclick="startReadMode()">Read Mode</div>
 </div>
 
-<!-- Quiz Container -->
-<div id="quiz-container">
+<div id="quiz-card">
   <div id="timer"></div>
   <div id="question-text"></div>
   <div id="options"></div>
@@ -152,14 +145,15 @@
   </div>
 </div>
 
-<!-- Result Container -->
-<div id="result-container">
+<div id="result-card">
   <div id="result"></div>
-  <button class="btn" onclick="backHome()">Back to Home</button>
+  <button class="btn" onclick="redirectHome()">Go to Home / Link</button>
 </div>
 
 <script>
-  // ==== DROP YOUR QUESTIONS HERE ====
+  // ===========================
+  // QUESTIONS PLACEHOLDER
+  // ===========================
   const questions = [
 {
     question: "The major role of WBCs is",
@@ -323,142 +317,143 @@ question: "A cell at telophase mitotic contains nuclei", options: ["4","3","2","
 {question: "Which of the following has the smallest size", options: ["erythrocytes","platelets","leucocytes","lymphocytes"], answer: 1},
 {question: "Bulk wastes from alimentary canal are not excretory because", options: ["they are generated within the cell","products of cellular metabolism","none","they have not been produced within cells"], answer: 2},
 {question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2}
-]; // <-- Drop your 110 questions here in the format: { question: "", options: ["","","",""], answer: 0 }
+];
 
   let selectedQuestions = [];
-  let currentIndex = 0;
+  let currentQuestionIndex = 0;
   let score = 0;
-  let mode = ""; // "15", "30", "all", "read"
-  let timerInterval;
-  let totalTime = 0; // in seconds
+  let quizMode = ''; // 'all', 'read', '15', '30'
 
-  function startQuiz(qty) {
-    if(allQuestions.length === 0){
-      alert("No questions loaded! Please drop your questions in the code.");
-      return;
-    }
-
-    mode = qty;
-    currentIndex = 0;
+  // ===========================
+  // START QUIZ
+  // ===========================
+  function startQuiz(mode) {
+    quizMode = mode;
+    currentQuestionIndex = 0;
     score = 0;
-    document.querySelector('.home-container').style.display = 'none';
-    document.getElementById('quiz-container').style.display = 'block';
-    selectedQuestions = [];
 
-    if (qty === "15" || qty === "30") {
-      const count = qty === "15" ? 15 : 30;
-      let copy = [...allQuestions];
-      while(selectedQuestions.length < count && copy.length > 0){
-        const idx = Math.floor(Math.random() * copy.length);
-        selectedQuestions.push(copy.splice(idx,1)[0]);
-      }
-    } else {
+    if(mode === '15' || mode === '30') {
+      selectedQuestions = shuffleArray(allQuestions).slice(0, Number(mode));
+    } else if(mode === 'all') {
       selectedQuestions = [...allQuestions];
     }
 
-    if (mode !== "read") {
-      totalTime = selectedQuestions.length * 60; // 1 min per question
-      updateTimer();
-      timerInterval = setInterval(() => {
-        totalTime--;
-        if(totalTime <= 0){
-          clearInterval(timerInterval);
-          submitQuiz();
-        }
-        updateTimer();
-      }, 1000);
-    }
-
-    showQuestion();
+    document.getElementById('home-cards').style.display = 'none';
+    document.getElementById('quiz-card').style.display = 'block';
+    renderQuestion();
+    startTimer();
   }
 
   function startReadMode() {
-    mode = "read";
-    if(allQuestions.length === 0){
-      alert("No questions loaded! Please drop your questions in the code.");
-      return;
-    }
+    quizMode = 'read';
     selectedQuestions = [...allQuestions];
-    currentIndex = 0;
-    document.querySelector('.home-container').style.display = 'none';
-    document.getElementById('quiz-container').style.display = 'block';
-    document.getElementById('timer').style.display = 'none';
-    showQuestion();
+    document.getElementById('home-cards').style.display = 'none';
+    document.getElementById('quiz-card').style.display = 'block';
+    renderQuestion();
   }
 
-  function updateTimer() {
-    const minutes = Math.floor(totalTime / 60);
-    const seconds = totalTime % 60;
-    document.getElementById('timer').innerText = `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
-  }
+  // ===========================
+  // RENDER QUESTION
+  // ===========================
+  function renderQuestion() {
+    const q = selectedQuestions[currentQuestionIndex];
+    if(!q) return;
 
-  function showQuestion() {
-    const q = selectedQuestions[currentIndex];
-    document.getElementById('question-text').innerText = q.question;
+    document.getElementById('question-text').innerText = `Q${currentQuestionIndex+1}: ${q.question}`;
+
     const optionsDiv = document.getElementById('options');
-    optionsDiv.innerHTML = "";
-    q.options.forEach((opt, idx) => {
+    optionsDiv.innerHTML = '';
+
+    q.options.forEach((opt, index) => {
       const btn = document.createElement('button');
-      btn.classList.add('option-btn');
+      btn.className = 'option-btn';
       btn.innerText = opt;
-      btn.onclick = () => selectAnswer(idx, btn);
-      if(mode === "read") {
-        if(idx === q.answer) btn.classList.add('correct');
+
+      if(quizMode === 'read') {
+        if(index === q.answer) btn.classList.add('correct');
+      } else {
+        btn.onclick = () => checkAnswer(index);
       }
+
       optionsDiv.appendChild(btn);
     });
   }
 
-  function selectAnswer(idx, btn) {
-    const q = selectedQuestions[currentIndex];
-    if(mode !== "read") {
-      if(idx === q.answer) {
-        btn.classList.add('correct');
-        score++;
-      } else {
-        btn.classList.add('wrong');
-        const optionButtons = document.querySelectorAll('.option-btn');
-        optionButtons[q.answer].classList.add('correct');
-      }
-      const optionButtons = document.querySelectorAll('.option-btn');
-      optionButtons.forEach(b => b.disabled = true);
+  function checkAnswer(selectedIndex) {
+    const q = selectedQuestions[currentQuestionIndex];
+    const optionsDiv = document.getElementById('options');
+    const buttons = optionsDiv.querySelectorAll('button');
+
+    if(selectedIndex === q.answer) {
+      buttons[selectedIndex].classList.add('correct');
+      score++;
+    } else {
+      buttons[selectedIndex].classList.add('wrong');
+      buttons[q.answer].classList.add('correct');
     }
+
+    // Disable all options
+    buttons.forEach(btn => btn.disabled = true);
   }
 
   function nextQuestion() {
-    if(currentIndex < selectedQuestions.length -1) {
-      currentIndex++;
-      showQuestion();
+    if(currentQuestionIndex < selectedQuestions.length - 1){
+      currentQuestionIndex++;
+      renderQuestion();
     }
   }
 
   function prevQuestion() {
-    if(currentIndex > 0) {
-      currentIndex--;
-      showQuestion();
+    if(currentQuestionIndex > 0){
+      currentQuestionIndex--;
+      renderQuestion();
     }
   }
 
   function submitQuiz() {
-    clearInterval(timerInterval);
-    document.getElementById('quiz-container').style.display = 'none';
-    document.getElementById('result-container').style.display = 'block';
-    document.getElementById('result').innerHTML = `
-      <h2>Your Score: ${score} / ${selectedQuestions.length}</h2>
-      <ol>
-        ${selectedQuestions.map(q => `<li>${q.question}<br><strong>Answer: ${q.options[q.answer]}</strong></li>`).join('')}
-      </ol>
-    `;
+    document.getElementById('quiz-card').style.display = 'none';
+    document.getElementById('result-card').style.display = 'block';
+    document.getElementById('result').innerHTML = `Your score: ${score}/${selectedQuestions.length}`;
   }
 
   function backHome() {
-    document.getElementById('quiz-container').style.display = 'none';
-    document.getElementById('result-container').style.display = 'none';
-    document.querySelector('.home-container').style.display = 'flex';
-    document.getElementById('timer').style.display = 'block';
+    document.getElementById('quiz-card').style.display = 'none';
+    document.getElementById('result-card').style.display = 'none';
+    document.getElementById('home-cards').style.display = 'flex';
+    score = 0;
+    currentQuestionIndex = 0;
   }
 
+  function redirectHome() {
+    window.location.href = 'https://your-redirect-link.com'; // <-- CHANGE LINK HERE
+  }
+
+  // ===========================
+  // TIMER
+  // ===========================
+  let timerInterval;
+  function startTimer() {
+    clearInterval(timerInterval);
+    let time = 600; // default 10 minutes in seconds
+    timerInterval = setInterval(() => {
+      let minutes = Math.floor(time / 60);
+      let seconds = time % 60;
+      document.getElementById('timer').innerText = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      if(time <= 0) {
+        clearInterval(timerInterval);
+        submitQuiz();
+      }
+      time--;
+    }, 1000);
+  }
+
+  // ===========================
+  // UTILITY
+  // ===========================
+  function shuffleArray(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
 </script>
 
 </body>
-</html>
+  </html>
