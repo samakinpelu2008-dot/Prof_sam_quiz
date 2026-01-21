@@ -1,350 +1,287 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Ultimate Quiz App</title>
-<style>
-*{box-sizing:border-box;font-family:"Segoe UI",sans-serif;margin:0;padding:0;}
-body{min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;padding:20px;}
-.container{width:1000px;max-width:95%;}
-
-/* Title */
-h1{color:#fff;text-align:center;margin-bottom:30px;font-size:36px;}
-
-/* Mode Cards */
-.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:25px;margin-bottom:40px;}
-.mode-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:22px;padding:60px 20px;box-shadow:0 20px 40px rgba(0,0,0,0.25);cursor:pointer;transition:0.2s;display:flex;flex-direction:column;align-items:center;text-align:center;}
-.mode-card:hover{transform:translateY(-5px);box-shadow:0 25px 50px rgba(0,0,0,0.35);}
-.mode-card h2{margin-bottom:10px;font-size:28px;}
-.mode-card p{font-size:16px;color:#e0e0ff;}
-
-/* Quiz Card */
-.card{display:none;background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.25);}
-#homeBtn{background:#667eea;color:#fff;padding:12px 18px;border:none;border-radius:12px;cursor:pointer;margin-bottom:20px;font-size:16px;}
-.timer{float:right;font-size:18px;color:#555;font-weight:600;}
-.progress{font-size:16px;color:#666;margin-bottom:15px;}
-.question{font-size:28px;font-weight:700;margin-bottom:20px;min-height:250px;padding:30px;background:#f2f4ff;border-radius:20px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
-.options{display:grid;gap:22px;margin-bottom:15px;}
-.option{padding:25px;border-radius:20px;background:#f2f4ff;cursor:pointer;border:2px solid transparent;transition:.2s;font-size:20px;font-weight:500;}
-.option:hover{background:#e3e8ff;transform:translateY(-2px);}
-.option.selected{border-color:#667eea;}
-.option.correct{background:#d6f5dc;border-color:#2ecc71;}
-.option.wrong{background:#ffd6d6;border-color:#e74c3c;opacity:0.85;}
-
-/* Navigation Buttons */
-.nav{display:flex;justify-content:space-between;margin-top:25px;}
-.nav button{padding:16px 24px;border-radius:12px;border:none;cursor:pointer;background:#667eea;color:#fff;font-size:18px;}
-.nav button:disabled{background:#ccc;}
-
-/* Timer Modal */
-#timerModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
-#timerModal .modal-content{background:#fff;border-radius:20px;padding:40px;max-width:450px;text-align:center;}
-#timerModal button{padding:14px 28px;border:none;border-radius:12px;margin:8px;background:#667eea;color:#fff;cursor:pointer;font-size:16px;}
-
-/* Result Card */
-#resultCard{display:none;background:#fff;border-radius:22px;padding:40px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:left;width:1000px;max-width:95%;max-height:90vh;overflow-y:auto;}
-#resultCard h2{margin-bottom:20px;font-size:32px;color:#667eea;text-align:center;}
-.result-question{margin-bottom:25px;padding:20px;border-radius:16px;background:#f2f4ff;}
-.result-question h3{margin-bottom:10px;font-size:20px;}
-.result-question p{font-size:18px;margin-bottom:8px;}
-.correct-answer{color:#2ecc71;font-weight:700;}
-.wrong-answer{color:#e74c3c;font-weight:700;}
-#resultCard button{padding:16px 28px;border-radius:12px;border:none;background:#667eea;color:#fff;cursor:pointer;font-size:18px;display:block;margin:0 auto;margin-top:25px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Quiz App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f2f5; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .options button { display: block; width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background-color: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
+        .options button.correct { background-color: #28a745; }
+        .options button.wrong { background-color: #dc3545; }
+        .options button:hover { opacity: 0.9; }
+        #timer { font-size: 18px; margin-bottom: 20px; text-align: center; }
+        #submit-btn, #next-btn, #start-btn, #home-btn { padding: 12px 25px; font-size: 16px; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; }
+        #submit-btn { background-color: #28a745; color: #fff; }
+        #next-btn { background-color: #007bff; color: #fff; }
+        #start-btn { background-color: #17a2b8; color: #fff; }
+        #home-btn { background-color: #ffc107; color: #333; }
+        .result-card { text-align: center; font-size: 20px; }
+        select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; margin-top: 10px; }
+    </style>
 </head>
 <body>
 <div class="container">
-<h1>📘 Ultimate Quiz App</h1>
-
-<!-- MODE SELECTION -->
-<div class="mode-grid" id="modeBox">
-<div class="mode-card" onclick="handleModeClick('read')"><h2>📖 Read Mode</h2><p>Study questions with answers highlighted</p></div>
-<div class="mode-card" onclick="handleModeClick('all')"><h2>📝 Solve All</h2><p>Immediate feedback after selection</p></div>
-<div class="mode-card" onclick="handleModeClick('random15')"><h2>⏱ Random 15</h2><p>Set timer, 15 questions</p></div>
-<div class="mode-card" onclick="handleModeClick('random30')"><h2>⏱ Random 30</h2><p>Set timer, 30 questions</p></div>
+    <h1>Ultimate Quiz App</h1>
+    <div id="home" class="card">
+        <p>Select Mode:</p>
+        <button onclick="startQuiz(15)">15 Questions</button>
+        <button onclick="startQuiz(30)">30 Questions</button>
+        <button onclick="startQuiz('all')">Solve All</button>
+        <button onclick="startReadMode()">Read Mode</button>
+        <div>
+            <label>Set Timer (mins): </label>
+            <select id="timer-select">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15" selected>15</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+    </div><div id="quiz" class="card" style="display:none;">
+    <div id="timer"></div>
+    <div id="question-area"></div>
+    <div class="options" id="options"></div>
+    <button id="next-btn" onclick="nextQuestion()" style="display:none;">Next</button>
+    <button id="submit-btn" onclick="submitQuiz()">Submit</button>
+    <button id="home-btn" onclick="goHome()">Home</button>
 </div>
 
-<!-- QUIZ CARD -->
-<div class="card" id="quizCard">
-<button id="homeBtn" onclick="goHome()">🏠 Home</button>
-<div style="margin-bottom:15px;">
-<span class="timer" id="timer"></span>
-</div>
-<div class="progress" id="progress"></div>
-<div class="question" id="questionText"></div>
-<div class="options" id="optionsBox"></div>
-<div class="nav">
-<button onclick="prevQ()">⬅ Prev</button>
-<button onclick="nextQ()">Next ➡</button>
-<button id="submitBtn" onclick="submitQuiz()">Submit</button>
-</div>
+<div id="result" class="card" style="display:none;">
+    <div class="result-card" id="score"></div>
+    <button onclick="goHome()" id="home-btn">Back to Home</button>
 </div>
 
-<!-- TIMER MODAL -->
-<div id="timerModal" class="flex">
-<div class="modal-content">
-<h2>Select Timer</h2>
-<p>Choose a time for this quiz:</p>
-<div>
-<button onclick="setTimer(5)">5 min</button>
-<button onclick="setTimer(10)">10 min</button>
-<button onclick="setTimer(15)">15 min</button>
-<button onclick="setTimer(20)">20 min</button>
-</div>
-<div style="margin-top:15px;">
-<button onclick="cancelTimer()">Cancel</button>
-<button onclick="startSelectedTimer()">Start</button>
-</div>
-</div>
-</div>
-
-<!-- RESULT CARD -->
-<div class="card" id="resultCard">
-<h2>🎉 Quiz Completed!</h2>
-<div id="resultContent"></div>
-<button onclick="goHome()">🏠 Return Home</button>
-</div>
-
-<script>
-// ===== QUESTIONS =====
-const questions = [
-  { question: "The major role of WBCs is", options: ["vasodilation","transport of digested food","combating infections","none"], answer: 2 },
-  { question: "The organ responsible for the destruction of platelet is", options: ["spleen","heart","kidney","tissues"], answer: 0 },
-  { question: "One of the following is not a waste product of metabolism", options: ["urea","faeces","water","CO₂"], answer: 1 },
-  { question: "Gaseous exchange in plants is through stomata and", options: ["cambium","cuticle","lenticels","epidermis"], answer: 2 },
-  { question: "Which of these is not an event occurring during interphase", options: ["Organelles duplication","DNA replication","chromosome separation","DNA repair"], answer: 2 },
-  { question: "Throughout prophase, chromatins tend to", options: ["separate","multiply","dissolve","condense"], answer: 3 },
-  { question: "The upper and lower surfaces of the epidermis of leaves contain certain pores which are openings to the outside of leaves", options: ["holes","stomata","stomata and lenticels","filament"], answer: 1 },
-  { question: "The most abundant mineral ion in the blood plasma is", options: ["K⁺","Na⁺","Ca²⁺","Mg²⁺"], answer: 1 },
-  { question: "Arrange the events that occur when the solute concentration in the guard cell increases sequentially: 1) water enters guard cell, 2) turgor pressure increases, 3) stomata opens, 4) water potential reduces", options: ["3,1,4,2","2,3,4,1","1,2,3,4","4,1,2,3"], answer: 3 },
-  { question: "The point at which two sister chromatids join together is called", options: ["joint","centriole","centromere","centrosome"], answer: 2 },
-  { question: "Flukes have no special excretory organs but possess a pair of ducts called", options: ["flame cell","malphigian tubules","contractile vacuole","nephridia"], answer: 0 },
-  { question: "There are distinct tissues within the conducting vessel", options: ["1","2","3","6"], answer: 1 },
-  { question: "The blood cell that has the longest lifespan is", options: ["RBC","WBC","platelets","plasma"], answer: 0 },
-  { question: "The cell division that leads to the production of gametes is", options: ["multiplicational division","equational division","meiotic division","central division"], answer: 2 },
-  { question: "The expansion of body vessels is called", options: ["vasodilation","vasoconstriction","vasocompression","vasoregulation"], answer: 0 },
-  { question: "The osmotic concentration of blood plasma is affected by the following except", options: ["sugar","air","mineral salt","amino acid"], answer: 1 },
-  { question: "The most significant chemical energy in living cells is", options: ["NPDH2","NAPH","ATP","ADPH2"], answer: 2 },
-  { question: "Disappearance of nuclear membrane occurs at", options: ["telophase","late prophase","early prophase","interphase"], answer: 1 },
-  { question: "Interphase has how many stages", options: ["1","2","3","4"], answer: 2 },
-  { question: "Occurs when too much water is absorbed by roots and transpiration does not remove excess water", options: ["condensation","transpiration","Guttation","evapotranspiration"], answer: 2 },
-  { question: "Movement of separated chromosomes to opposite poles of a dividing cell is facilitated by", options: ["equatorial","spindle fibre","centriole","thread"], answer: 1 },
-  { question: "A cell has its chromosomes separated at the point of contact during anaphase I", options: ["centromere","kinetochore","telomere","mitotic spindle"], answer: 3 },
-  { question: "\"S\" phase involves", options: ["DNA synthesis","organelle duplication","DNA repair","secretion of enzymes"], answer: 0 },
-  { question: "The redness of blood is a function of", options: ["protein","haemoglobin","oxy-haemoglobin","plasma"], answer: 1 },
-  { question: "In blood clotting, when platelets rupture on exposure to air, a lipid protein called ______ is produced", options: ["prothrombin","fibrinogen","thrombin","thrombokinase"], answer: 3 },
-  { question: "The bean-shaped structure connecting the bladder to ureter is", options: ["liver","kidney","heart","spleen"], answer: 1 },
-  { question: "A bivalent chromosome has how many pairs of sister chromatids", options: ["3 pairs","1.5 pairs","2 pairs","1 pair"], answer: 2 },
-  { question: "The removal of waste products of metabolism from the body is called", options: ["photosynthesis","excretion","metabolism","respiration"], answer: 1 },
-  { question: "Examples of waste stored in cell vacuoles in leaves are", options: ["crystals of calcium oxalates and carbonates","crystals of carbon benzoate and calcium carbonates","crystals of carbon oxalates and calcium sulphate","crystals of carbon oxalates and calcium carbonate"], answer: 0 },
-  { question: "Cell cycle is divided into how many processes", options: ["4","3","2","1"], answer: 0 },
-  { question: "Vascular bundles occur throughout all organs of the plant", options: ["root, stem, leaf, flower","stem, root, epidermis, endodermis","parenchyma, sclerenchyma, collenchyma, endodermis","epidermis, endodermis, parenchyma, flower"], answer: 2 },
-  { question: "Correct movement of water from xylem to leaf is", options: ["xylem → vein → petiole → mesophyll → palisade layer","xylem → cambium → vein → petiole → mesophyll → palisade","xylem → petiole → vein → palisade → mesophyll layer","xylem → petiole → mesophyll → palisade layer"], answer: 2 },
-  { question: "The shape of the red blood cell is", options: ["concave","bi-concave disc-like","bi-convex disc-like","none"], answer: 1 },
-  { question: "Elements required by green plants in minute quantities are called", options: ["micro metabolic elements","essential elements","macro metabolic elements","all of the above"], answer: 0 },
-  { question: "Annelids are classified into the following orders except", options: ["polychaetae","hirudinae","silurinidae","oligochaetae"], answer: 2 },
-  { question: "The flow of solution in the phloem is", options: ["capillary movement","diffusion","osmosis","translocation"], answer: 3 },
-  { question: "The fluid in the flame cell is composed of", options: ["water and water substances","water alone","none of the above","waste substance alone"], answer: 2 },
-  { question: "How many daughter cells are obtained after two complete cycles of meiosis", options: ["20","8","12","16"], answer: 3 },
-  { question: "The physical vehicle for transport of materials in the blood is", options: ["red blood cell","white blood cell","plasma","platelets"], answer: 2 },
-  { question: "Among the five major pigments in chlorophyll, which is not identifiable?", options: ["carotene","quinine","xanthophyll","phaophytin"], answer: 1 },
-  { question: "The porphyrin ring of chlorophyll is joined to a phytol tail by", options: ["hydrogen bond","carbon linkage","triple covalent bond","ester linkage"], answer: 3 },
-  { question: "The internal environment feature that must be kept constant include all but one", options: ["none of the following","osmotic pressure","water","temperature"], answer: 0 },
-  { question: "The main function of the leaf is", options: ["photosynthesis","transpiration","gaseous exchange","respiration"], answer: 0 },
-  { question: "The functional unit of the mammalian kidney is", options: ["nephron","glomerular","distal tubule","malphigian tubule"], answer: 0 },
-  { question: "The internal factor that affects photosynthesis is", options: ["chlorophyll","temperature","light","water"], answer: 0 },
-  { question: "A nephridium consists of a ciliated funnel called", options: ["nephrostome","nephromia","none","nephromium"], answer: 0 },
-  { question: "The redness of blood is a function of", options: ["presence of fibrin","number of RBCs","presence of haemoglobin","presence of cytoglobin"], answer: 2 },
-  { question: "Cytokinesis in plant cells is by", options: ["cleavage furrow","laying of metaphase plate","all of the above","none"], answer: 0 },
-  { question: "Immature erythrocytes are not regarded as true cells because they lack all except", options: ["golgi apparatus","cell wall","nucleus","centriole"], answer: 2 },
-  { question: "Carboxylation of C3 compounds in photosynthesis involves", options: ["photosynthetic phosphorylation","dark reaction","ferredoxin","ribulose 1,5-diphosphate"], answer: 3 },
-  { question: "Reformation of nucleolus takes place in", options: ["anaphase","telophase","metaphase","prophase"], answer: 1 },
-  { question: "A single cell that begins life of most organisms is a product of", options: ["fertilization","conjugation","isolation","transduction"], answer: 0 },
-  { question: "In cell cycle, phases are", options: ["inclusive and exclusive","growth and division","none","initiation and progression"], answer: 1 },
-  { question: "Which of these is a reducing agent?", options: ["ATP","NADP","ADP","NADP2"], answer: 1 },
-  { question: "Which has the smallest size?", options: ["erythrocytes","platelets","leucocytes","lymphocytes"], answer: 1 },
-  { question: "Bulk wastes from alimentary canal are not excretory because", options: ["generated from within the cell","products of cellular metabolism","none","not produced within cells"], answer: 2 },
-  { question: "Which is not part of the lifespan of blood thrombocytes?", options: ["5","9","3","6"], answer: 2 },
-  { question: "Which of the following is not used in blood clotting?", options: ["leucocytes","plasma","thrombocytes","platelets"], answer: 0 },
-  { question: "The electron transfer system that generates ATP also evolves", options: ["O₂","S₂","CO₂","N₂"], answer: 0 },
-  { question: "The cell going through interphase is characterized by", options: ["growth and active metabolism","dormancy","activeness","resting and growth"], answer: 0 },
-  { question: "Which of the following is not an element of blood?", options: ["plasma","leucocyte","fibrinogen","thrombocyte"], answer: 2 },
-  { question: "Complex sequence of controlled biochemical reactions in cellular metabolism is", options: ["homeostasis","anabolism","catabolism","metabolic pathway"], answer: 3 },
-  { question: "A dividing cell producing gametes undergoes", options: ["equational division","central division","multiplication division","meiotic division"], answer: 3 },
-  { question: "The following are ways of excretion except", options: ["crystallization","diffusion","exosmosis","evaporation"], answer: 0 },
-  { question: "The main component of blood plasma are the following except", options: ["thrombin","fibrinogen","serumglobulin","prothrombins"], answer: 1 },
-  { question: "Multicellular structures are obtained from", options: ["integration","fertilization","differentiation","progression"], answer: 1 },
-  { question: "Complex sequence of control of biochemical reactions involved in cellular molecules is", options: ["homeostasis","catabolism","metabolic pathways","anabolism"], answer: 2 },
-  { question: "Second major phase of photosynthesis is", options: ["craving","dark reaction","production of NADPH","photodecomposition"], answer: 1 },
-  { question: "Polymorphs are formed from where", options: ["lymphatic glands","lymphoid tissues","thymus gland","bone marrow"], answer: 3 },
-  { question: "Transpiration is hinged on what?", options: ["respiration","translocation","photosynthesis","digestion"], answer: 1 },
-  { question: "Activities of the cell are regulated and controlled from", options: ["lysosome","nucleus","mitochondria","endoplasmic reticulum"], answer: 1 },
-  { question: "Better photosynthetic rate is obtained at favorable intensity of light during the day for what duration?", options: ["26 hours","45 hours","1-6 hours","10-12 hours"], answer: 3 },
-  { question: "Blood component with the longest life span is", options: ["RBC","leucocytes","WBC","thrombocytes"], answer: 0 },
-  { question: "Two major actors in the reduction of PGA to triose sugar are", options: ["NADPH2 and ATP","ATP and ADP","NaOH and ATP","NADP and ATP"], answer: 0 },
-  { question: "The stalk of the leaf is called", options: ["plumule","stipule","sessile","petiole"], answer: 3 },
-  { question: "Disappearance of the nuclear membrane occurs at", options: ["prophase","telophase","anaphase","metaphase"], answer: 0 },
-  { question: "A cell has its chromosomes separated at the points of", options: ["telomere","kinechore","centromere","chiasmata"], answer: 2 },
-  { question: "A nephridium consists of a ciliated funnel called", options: ["nephrostome","nephromia","none of the above","nephromium"], answer: 0 },
-  { question: "Cytokinesis in plant cells involves", options: ["construction of daughter cells","movement of daughter cells","formation of cleavage furrows","formation of metaphase plate"], answer: 2 },
-  { question: "An example of an area of the body with high oxygen concentration from where oxygen is transported is", options: ["glands","lungs","ileum tissues","heart"], answer: 1 },
-  { question: "A cell at telophase has", options: ["1 nucleus","4 nuclei","3 nuclei","2 nuclei"], answer: 3 },
-  { question: "Another name for photophosphorylation is", options: ["Light dependent reaction","Photo decomposition","Photosynthetic phosphorylation","Photosynthesis"], answer: 0 },
-  { question: "The term used for the maintenance of the steady state in animal body is", options: ["respiration","homeostasis","perspiration","hemeostray"], answer: 1 },
-  { question: "A clot is formed by a single needle like fibre formed by", options: ["fibrinogen","thrombin","fibrin","thromboplatin"], answer: 2 },
-  { question: "The following are examples of polymorphs except", options: ["neutrophills","lymphocytes","cosinphills","basophils"], answer: 1 },
-  { question: "In a metabolic pathway, one chemical is transformed into another with the help of a sequence of", options: ["coenzymes","enzymes","precursors","catalyst"], answer: 1 },
-  { question: "The number of pair of chromosomes in the cell of a man is", options: ["24","23","22","21"], answer: 1 },
-  { question: "What is the major purpose of catabolism", options: ["to provide energy and components needed for anabolism","to break down complex molecules needed for anabolism","to break down materials for anabolism","to break down energy and components needed for anabolism"], answer: 0 },
-  { question: "Where exactly does photosynthetic activity occur?", options: ["phaeophytin","xanthopylls","chloroplast","bacteriochlorophyll"], answer: 2 },
-  { question: "The basic unit of chlorophyll molecules is", options: ["chlorophyll","phaeophytin","xanthophyll","porphyrin ring"], answer: 3 },
-  { question: "When kidney is cut longitudinally, it reveals all but one of the following", options: ["medulla","pelvis","cortex","vacuoles"], answer: 3 },
-  { question: "T cell and B cell are types of", options: ["lymphocytes","phagocytes","erythrocytes","thrombocytes"], answer: 0 },
-  { question: "A cell at telophase mitotic contains how many nuclei?", options: ["4","3","2","1"], answer: 2 },
-  { question: "The chlorophyll-like pigment found in purple bacteria is", options: ["bacteria chlorophyll","bacterio viridin","bacteria viridin","bacteriochlorophyll"], answer: 3 },
-  { question: "The condition whereby blood sugar is uncontrollably high is called", options: ["hyperglycemia","nomoglycacemia","hypoglycemia","glycosuria"], answer: 2 },
-  { question: "The first stable intermediate of the overall photosynthetic process is", options: ["phosphoglyceric acid","NAD","NADPP","Ribulose 1,5-diphosphate"], answer: 0 },
-  { question: "The term used for the maintenance of the steady state in animal body is", options: ["respiration","homeotamy","excretion","homeostasis"], answer: 3 },
-  { question: "The active enzyme that hydrolyses fibrinogen in the process of blood clot is", options: ["prothrombin","fibrinogen","thrombin","thrombokinase"], answer: 2 },
-  { question: "The movement of materials occurring in plants through a specified system is", options: ["transpiration","translocation","respiration","none"], answer: 1 },
-  { question: "The source of energy used by chemoautotrophic sulphur bacteria to synthesize carbohydrate in the absence of chlorophyll and light is", options: ["oxidation of H2S","none","light","reduction of H2S"], answer: 0 },
-  { question: "Cytokinesis in plant cell is by", options: ["cleavage furrow","laying of metaphase plate","all of the above","none"], answer: 0 },
-  { question: "Immature erythrocytes are not regarded as true cells because they lack all except", options: ["golgi apparatus","cell wall","nucleus","centriole"], answer: 2 },
-  { question: "Carboxylation of C3 compounds involved in incorporation of CO2 in photosynthesis is", options: ["photosynthetic phosphorylation","dark reaction","ferredoxin","ribulose 1,5-diphosphate"], answer: 3 },
-  { question: "Reformation of nucleolus is one of the events taking place in", options: ["anaphase","telophase","metaphase","prophase"], answer: 1 },
-  { question: "A single cell that begins life of most organisms is a product of", options: ["fertilization","conjugation","isolation","transduction"], answer: 0 },
-  { question: "In cell cycle, there are ___ phases", options: ["inclusive and exclusive","growth and division","none","initiation and progression"], answer: 1 },
-  { question: "Which of these is a reducing agent?", options: ["ATP","NADP","ADP","NADP2"], answer: 1 },
-  { question: "Which of the following has the smallest size?", options: ["erythrocytes","platelets","leucocytes","lymphocytes"], answer: 1 },
-  { question: "The bulk wastes generated from alimentary canal system are not excretory because", options: ["they are generated from within the cell","they are products of cellular metabolism","none","they have not been produced within the cells"], answer: 2 },
-  { question: "Which of the following is not part of life span of blood thrombocytes?", options: ["5","9","3","6"], answer: 2 },
-  { question: "Which of the following is not used in blood clotting?", options: ["leucocytes","plasma","thrombocytes","platelets"], answer: 0 },
-  { question: "The electron transfer system that generates ATP also evolves", options: ["O2","S2","CO2","N2"], answer: 0 },
-  { question: "The cell going through interphase is characterized by", options: ["growth and active metabolism","dormancy","activeness","resting and growth"], answer: 0 },
-  { question: "Which of the following is not an element of blood?", options: ["plasma","leucocyte","fibrinogen","thrombocyte"], answer: 2 },
-  { question: "Complex sequence of controlled biochemical metabolism is a reaction in cellular", options: ["homeostasis","anabolism","catabolism","metabolic pathway"], answer: 3 },
-  { question: "A dividing cell producing gametes undergoes", options: ["equational division","central division","multiplication division","meiotic division"], answer: 3 },
-  { question: "The following are ways of excretion except", options: ["crystallization","diffusion","exosmosis","evaporation"], answer: 0 },
-  { question: "The main component of blood plasma are the following except", options: ["thrombin","fibrinogen","serumglobulin","prothrombins"], answer: 1 },
-  { question: "Multicellular structures are obtained from", options: ["integration","fertilization","differentiation","progression"], answer: 1 },
-  { question: "Complex sequence of control of biochemical reactions involved in cellular molecules is", options: ["homeostasis","catabolism","metabolic pathways","anabolism"], answer: 2 },
-  { question: "Second major phase of photosynthesis is", options: ["craving","dark reaction","production of NADPH","photodecomposition"], answer: 1 },
-  { question: "Polymorphs are formed from where?", options: ["lymphatic glands","lymphoid tissues","thymus gland","bone marrow"], answer: 3 },
-  { question: "Transpiration is hinged on what?", options: ["respiration","translocation","photosynthesis","digestion"], answer: 1 },
-  { question: "Activities of the cell are regulated and controlled from", options: ["lysosome","nucleus","mitochondria","endoplasmic reticulum"], answer: 1 },
-  { question: "Better photosynthetic rate is obtained at favorable intensity of light during the day for what duration?", options: ["26 hours","45 hours","1-6 hours","10-12 hours"], answer: 3 },
-  { question: "Blood component with the longest lifespan is", options: ["RBC","leucocytes","WBC","thrombocytes"], answer: 0 },
-  { question: "Two major actors in the reduction of PGA to triose sugar are", options: ["NADPH2 and ATP","ATP and ADP","NaOH and ATP","NADP and ATP"], answer: 0 },
-  { question: "The stalk of the leaf is called", options: ["plumule","stipule","sessile","petiole"], answer: 3 }
+</div><script>
+let questions = [
+{question: "The major role of WBCs is", options: ["vasodilation", "transport of digested food", "combacting infections", "none"], answer: 2},
+{question: "The organ responsible for the destruction of platelet is", options: ["spleen", "heart", "kidney", "tissues"], answer: 0},
+{question: "One of the following is not a waste product of metabolism", options: ["urea", "faeces", "water", "CO₂"], answer: 1},
+{question: "Gaseous exchange in plants is through stomata and", options: ["cambium", "cuticle", "lenticels", "epidermis"], answer: 2},
+{question: "Which of these is not an event occurring during interphase", options: ["Organelles duplication", "DNA replication", "chromosome separation", "DNA repair"], answer: 2},
+// ... Add all 110 questions here using the format above ...
+{question: "The major role of WBCs is", options: ["vasodilation","transport of digested food","combacting infections","none"], answer: 2},
+{question: "The organ responsible for the destruction of platelet is", options: ["spleen","heart","kidney","tissues"], answer: 0},
+{question: "One of the following is not a waste product of metabolism", options: ["urea","faeces","water","CO₂"], answer: 1},
+{question: "Gaseous exchange in plants is through stomata and", options: ["cambium","cuticle","lenticels","epidermis"], answer: 2},
+{question: "Which of these is not an event occurring during interphase", options: ["Organelles duplication","DNA replication","chromosome separation","DNA repair"], answer: 2},
+{question: "Throughout prophase, chromatins tend to", options: ["separate","multiply","dissolve","condense"], answer: 3},
+{question: "The upper and lower surfaces of the epidermis of leaves contain certain pores called which are openings to the outside of leaves", options: ["holes","stomata","stomata and lenticels","filament"], answer: 1},
+{question: "The most abundant mineral ion in the blood plasma is", options: ["K⁺","Na⁺","Ca²⁺","Mg²⁺"], answer: 1},
+{question: "Arrange the events that occur when the solute concentration in the guard cell increases sequentially", options: ["3,1,4,2","2,3,4,1","1,2,3,4","4,1,2,3"], answer: 3},
+{question: "The point at which two sister chromatids join together is called", options: ["joint","centriole","centromere","centrosome"], answer: 2},
+{question: "Flukes have no special excretory organs but they possess a pair of duct called", options: ["flame cell","malphigian tubules","contractile vacuole","nephridia"], answer: 0},
+{question: "There are distinct tissues within the conducting vessel", options: ["1","2","3","6"], answer: 1},
+{question: "The blood cell that has the longest life span is", options: ["RBC","WBC","platelets","plasma"], answer: 0},
+{question: "The cell division that leads to the production of gamete is", options: ["multiplicational division","equational division","meiotic division","central division"], answer: 2},
+{question: "The expansion of body vessel is called", options: ["vasodilation","vasoconstriction","vasocompression","vasoregulation"], answer: 0},
+{question: "The osmotic concentration of the blood plasma is affected by the following except", options: ["sugar","air","mineral salt","amino acid"], answer: 1},
+{question: "The most significant chemical energy in living cells is", options: ["NPDH2","NAPH","ATP","ADPH2"], answer: 2},
+{question: "Disappearance membrane occurs at of nuclear", options: ["telophase","late prophase","early prophase","interphase"], answer: 2},
+{question: "Interphase has how many stages", options: ["1","2","3","4"], answer: 2},
+{question: "Occurs when too much water is absorbed by the roots and transpiration does not occur rapidly enough", options: ["condensation","transpiration","Guttation","evapotranspiration"], answer: 2},
+{question: "Movement of separated chromosomes to the opposite poles of a dividing cell is facilitated by", options: ["equatorial","spindle fibre","centriole","thread"], answer: 1},
+{question: "A cell has its chromosomes separated at the point of contacts with during anaphase I", options: ["centromere","kinetochore","telomere","mitotic spindle"], answer: 3},
+{question: "\"S\" phase involves", options: ["DNA synthesis","organelle duplication","DNA repair","secretion of enzymes"], answer: 0},
+{question: "The redness of blood is a function of", options: ["protein","haemoglobin","oxy-haemoglobin","plasma"], answer: 1},
+{question: "In blood clotting process, when the platelets ruptures on exposure to air, a lipid protein called produced is", options: ["prothrombin","fibrinogen","thrombin","thrombokinase"], answer: 3},
+{question: "The bean-shaped structure connecting the bladder to ureter is", options: ["liver","kidney","heart","spleen"], answer: 1},
+{question: "A bivalent chromosome has how many pairs of sister chromatid", options: ["3 pairs","1.5 pairs","2 pairs","1 pair"], answer: 2},
+{question: "The removal of waste product of metabolism from the body is called", options: ["photosynthesis","excretion","metabolism","respiration"], answer: 1},
+{question: "Examples of waste stored in cell vacuoles and cell walls in leaves", options: ["crystal of calcium oxalates and carbonates","crystal of carbon benzoate and calcium carbonates","crystal of carbon oxalates and calcium sulphate","crystal of carbon oxalates and calcium carbonate"], answer: 0},
+{question: "Cell cycle is divided into how many processes", options: ["4","3","2","1"], answer: 0},
+{question: "Vascular bundles which occur throughout all the organs of the plant are", options: ["root, stem, leaf, flower","stem, root, epidermis, endodermis","parenchyma, sclerenchyma and endodermis collenchyma","epidermis, endodermis, parenchyma and flower"], answer: 2},
+{question: "Correct movement of water from xylem to leaf", options: ["xylem vein petiole mesophyll palisades layer","xylem cambium vein petiole mesophyll palisades","xylem petiole vein palisades mesophyll layer","xylem petiole mesophyll layer palisade layer"], answer: 2},
+{question: "The shape of the red blood cell is", options: ["concave","bi-concave disc-like","bi-convex disc-like","none"], answer: 1},
+{question: "Elements required by green plants in minute quantity are called", options: ["micro metabolic elements","essential elements","macro metabolic elements","all of the above"], answer: 0},
+{question: "Annelids are classified into the following orders except", options: ["polychaetae","hirudinae","silurinidae","olygochaetae"], answer: 2},
+{question: "The flow of solution in the phloem is", options: ["capillary movement","diffusion","osmosis","translocation"], answer: 3},
+{question: "The fluid in the flame cell is composed of", options: ["water and waste substances","water alone","none of the above","waste substance alone"], answer: 2},
+{question: "How many daughter cells are obtained after two complete cycles of meiosis", options: ["20","8","12","16"], answer: 3},
+{question: "The physical vehicle for transport of materials in the blood is", options: ["red blood cell","white blood cell","plasma","platelets"], answer: 2},
+{question: "Among five major pigments, which is NOT identifiable in chlorophyll", options: ["carotene","quinine","xanthophyll","phaophytin"], answer: 1},
+{question: "The porphyrin ring of chlorophyll is joined to a phytol tail by", options: ["hydrogen bond","carbon linkage","triple covalent bond","ester linkage"], answer: 3},
+{question: "Important feature of the internal environment that must be kept constant include all but one", options: ["none of the following","osmotic pressure","water","temperature"], answer: 0},
+{question: "Main function of leaf is", options: ["photosynthesis","transpiration","gaseous exchange"], answer: 0},
+{question: "Functional unit of the mammalian kidney is", options: ["nephron","glomerular","distal tubule","malphigian tubule"], answer: 0},
+{question: "Internal factor that affects photosynthesis is", options: ["chlorophyll","temperature","light","water"], answer: 0},
+{question: "A nephridium consists of a ciliated funnel called", options: ["nephromium","nephromia","none","nephrostome"], answer: 3},
+{question: "Redness of blood is a function of", options: ["presence of fibrin","number of RBCs","presence of haemoglobin","presence of cytoglobin"], answer: 2},
+{question: "Cytokinesis in plant cell is by", options: ["cleavage furrow","laying of metaphase plate","all of the above"], answer: 0},
+{question: "Immature Erythrocytes are not regarded as true cells because they lack all except", options: ["golgi apparatus","cell wall","nucleus","centriole"], answer: 2},
+{question: "Carboxylation of C3 compounds in photosynthesis is", options: ["photosynthetic phosphorylation","dark reaction","ferredoxin","ribulose 1,5-diphosphate"], answer: 3},
+{question: "Reformation of nucleolus occurs during", options: ["anaphase","telophase","metaphase","prophase"], answer: 1},
+{question: "Single cell that begins life of most organisms is a product of", options: ["fertilization","conjugation","isolation","transduction"], answer: 0},
+{question: "In cell cycle, phases are", options: ["inclusive and exclusive","growth and division","none","initiation and progression"], answer: 1},
+{question: "Which of these is a reducing agent?", options: ["ATP","NADP","ADP","NADP2"], answer: 1},
+{question: "Which of the following has the smallest size", options: ["erythrocytes","platelets","leucocytes","lymphocytes"], answer: 1},
+{question: "Bulk wastes from alimentary canal are not excretory because", options: ["they are generated within the cell","products of cellular metabolism","none","they have not been produced within cells"], answer: 2},
+{question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2},
+{question: "Which of the following is not used in blood clotting", options: ["leucocytes","plasma","thrombocytes","platelets"], answer: 0},
+{question: "The electron transfer system that generates ATP also evolves", options: ["O2","S2","CO₂","N2"], answer: 0},
+{question: "Cell going through interphase is characterized by", options: ["growth and active metabolism","dormancy","activeness","resting and growth"], answer: 0},
+{question: "Which of the following is not an element of blood?", options: ["plasma","leucocyte","fibrinogen","thrombocyte"], answer: 2},
+{question: "Complex sequence of controlled biochemical reaction in cellular metabolism is", options: ["homeostasis","anabolism","catabolism","metabolic pathway"], answer: 3},
+{question: "Dividing cell producing gametes undergoes", options: ["equational division","central division","multiplication division","meiotic division"], answer: 3},
+{question: "Ways of excretion except", options: ["crystallization","diffusion","exosmosis","evaporation"], answer: 0},
+{question: "Main component of blood plasma except", options: ["thrombin","fibrinogen","serumglobulin","prothrombins"], answer: 1},
+{question: "Multicellular structures are obtained from", options: ["integration","fertilization","differentiation","progression"], answer: 1},
+{question: "Control of biochemical reaction involved in cellular molecules is", options: ["homeostasis","catabolism","metabolic pathways","anabolism"], answer: 2},
+{question: "Second major phase of photosynthesis is", options: ["craving","dark reaction","production of NADPH","photodecomposition"], answer: 1},
+{question: "Polymorphs are formed from where", options: ["lymphatic glands","lymphoid tissues","thymus gland","bone marrow"], answer: 3},
+{question: "Transpiration is hinged on what?", options: ["respiration","translocation","photosynthesis","digestion"], answer: 1},
+{question: "Activities of the cell are regulated and controlled from", options: ["lysosome","nucleus","mitochondria","endoplasmic reticulum"], answer: 1},
+{question: "Better photosynthetic rate is obtained at favourable intensity of light during the day for what duration", options: ["26 hours","45 hours","1-6 hours","10-12 hours"], answer: 3},
+{question: "Blood component with the longest life span is", options: ["RBC","leucocytes","WBC","thrombocytes"], answer: 0},
+{question: "Two major actors in reduction of PGA to triose sugar are", options: ["NADPH2 and ATP","ATP and ADP","NaOH and ATP","NADP and ATP"], answer: 0},
+{question: "The stalk of the leaf is called", options: ["plumule","stipule","sessile","petiole"], answer: 3},
+{question: "Disappearance of the nuclear membrane occurs at", options: ["prophase","telophase","anaphase","metaphase"], answer: 0},
+{question: "A cell has its chromosomes separated at the points of", options: ["telomere","kinechore","centromere","chiasmata"], answer: 2},
+{question: "A nephridium consists of a ciliated funnel called", options: ["nephrostome","nephromia","none of the above","nephromium"], answer: 0},
+{question: "Cytokinesis in plant cells involves", options: ["construction of daughter cells","movement of daughter cells","formation of cleavage furrows","formation of metaphase plate"], answer: 2},
+{question: "An example of an area of the body with high oxygen concentration is", options: ["glands","lungs","ileum tissues"], answer: 1},
+{question: "A cell at telophase has", options: ["1 nucleus","4 nuclei","3 nuclei","2 nuclei"], answer: 3},
+{question: "Another name for photophosphorylation is", options: ["Light dependent reaction","Photo decomposition","Photosynthetic phosphorylation","Photosynthesis"], answer: 0},
+{question: "Term used for maintenance of steady state in animal body is", options: ["respiration","homeostasis","perspiration","hemeostray"], answer: 1},
+{question: "A clot is formed by a single needle like fibre formed by", options: ["fibrinogen","thrombin","fibrin","thromboplatin"], answer: 2},
+{question: "Examples of polymorphs except", options: ["neutrophills","lymphocytes","cosinphills","basophils"], answer: 1},
+{question: "In a metabolic pathway, one chemical is transformed into another with the help of", options: ["coenzymes","enzymes","precursors","catalyst"], answer: 1},
+{question: "Number of pair of chromosomes in the cell of a man is", options: ["24","23","22","21"], answer: 1},
+{question: "Major purpose of catabolism is", options: ["to provide energy and components for anabolism","to break down complex molecules needed for anabolism","to break down materials for anabolism","to break down energy and components needed for anabolism"], answer: 0},
+{question: "Where exactly does photosynthetic activities occur", options: ["phaeophytin","xanthophylls","bacterio viridin","chloroplast"], answer: 3},
+{question: "Basic unit of chlorophyll molecules is", options: ["chlorophyll","phaeophytin","xanthophyll","porphyrin ring"], answer: 3},
+{question: "When kidney is cut longitudinally, it reveals all but one", options: ["medulla","pelvis","cortex","vacuoles"], answer: 3},
+{question: "T cell and B cell are types of", options: ["lymphocytes","phagocytes","erythrocytes","thrombocytes"], answer: 0},
+{question: "A cell at telophase mitotic contains nuclei", options: ["4","3","2","1"], answer: 2},
+{question: "Chlorophyll like pigment found in purple bacteria is", options: ["bacteria chlorophyll","bacterio viridin","bacteria viridin","bacteriochlorophyll"], answer: 3},
+{question: "Condition where blood sugar level is uncontrollably high is called", options: ["hyperglycemia","nomoglycacemia","hypoglycemia","glycosuria"], answer: 2},
+{question: "First stable intermediate of overall photosynthetic process is", options: ["phosphoglyceric acid","NAD","NADPP","Ribulose 1,5-diphosphate"], answer: 0},
+{question: "Term used for maintenance of steady state in animal body is", options: ["respiration","homeotamy","excretion","homeostasis"], answer: 3},
+{question: "Active enzyme that hydrolyses fibrinogen in blood clot is", options: ["prothrombin","fibrinogen","thrombin","thrombokinase"], answer: 2},
+{question: "Movement of materials in plants through a specified system is", options: ["transpiration","translocation","respiration","none"], answer: 1},
+{question: "Source of energy used by chemoautotrophic sulphur bacteria is", options: ["oxidation of H2S","none","light","reduction of H2S"], answer: 1},
+{question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2},
+{question: "Cytokinesis in plant cell is by", options: ["cleavage furrow","laying of metaphase plate","all of the above"], answer: 0},
+{question: "Immature Erythrocytes are not regarded as true cells because they lack all except", options: ["golgi apparatus","cell wall","nucleus","centriole"], answer: 2},
+{question: "Carboxylation of C3 compounds in photosynthesis is", options: ["photosynthetic phosphorylation","dark reaction","ferredoxin","ribulose 1,5-diphosphate"], answer: 3},
+{question: "Reformation of nucleolus occurs during", options: ["anaphase","telophase","metaphase","prophase"], answer: 1},
+{question: "Single cell that begins life of most organisms is a product of", options: ["fertilization","conjugation","isolation","transduction"], answer: 0},
+{question: "In cell cycle, phases are", options: ["inclusive and exclusive","growth and division","none","initiation and progression"], answer: 1},
+{question: "Which of these is a reducing agent?", options: ["ATP","NADP","ADP","NADP2"], answer: 1},
+{question: "Which of the following has the smallest size", options: ["erythrocytes","platelets","leucocytes","lymphocytes"], answer: 1},
+{question: "Bulk wastes from alimentary canal are not excretory because", options: ["they are generated within the cell","products of cellular metabolism","none","they have not been produced within cells"], answer: 2},
+{question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2}
 ];
 
-// ===== QUIZ ENGINE =====
-let mode="", quizQuestions=[], index=0, answers={}, timeLeft=0, timerInterval=null, selectedTime=15;
-const REDIRECT_URL="https://www.effectivegatecpm.com/prwmz1t9?key=17b80b2cde4a338414105a2c5427f8ce";
+let currentQuestion = 0;
+let userAnswers = [];
+let selectedMode = 0;
+let timerInterval;
+let timeLeft = 0;
 
-function handleModeClick(selectedMode){
-const lastRedirect=localStorage.getItem("lastRedirect")||0;
-const now=Date.now();
-if(now-lastRedirect>12*60*60*1000){
-localStorage.setItem("selectedModeAfterRedirect",selectedMode);
-localStorage.setItem("lastRedirect",now);
-window.location.href=REDIRECT_URL;
-return;
-}
-mode=selectedMode;
-if(selectedMode==="random15"||selectedMode==="random30"){
-document.getElementById("timerModal").style.display="flex";
-} else { startQuiz(selectedMode); }
-}
+function startQuiz(mode){
+    selectedMode = mode;
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    currentQuestion = 0;
+    userAnswers = [];
 
-function setTimer(minutes){ selectedTime=minutes; }
-function cancelTimer(){ document.getElementById("timerModal").style.display="none"; goHome(); }
-function startSelectedTimer(){ document.getElementById("timerModal").style.display="none"; startQuiz(mode); }
+    if(mode !== 'all'){
+        let timerSelect = document.getElementById('timer-select');
+        timeLeft = parseInt(timerSelect.value) * 60;
+        startTimer();
+    }
 
-window.addEventListener("DOMContentLoaded",()=>{
-const resumedMode=localStorage.getItem("selectedModeAfterRedirect");
-if(resumedMode){localStorage.removeItem("selectedModeAfterRedirect");handleModeClick(resumedMode);}
-});
-
-function startQuiz(selectedMode){
-index=0; answers={};
-if(mode==="all"||mode==="read"){ quizQuestions=[...QUESTIONS]; }
-if(mode==="random15"){ quizQuestions=shuffle([...QUESTIONS]).slice(0,15); }
-if(mode==="random30"){ quizQuestions=shuffle([...QUESTIONS]).slice(0,30); }
-document.getElementById("modeBox").style.display="none";
-document.getElementById("quizCard").style.display="block";
-document.getElementById("resultCard").style.display="none";
-timeLeft=selectedTime*60;
-if(mode==="random15"||mode==="random30"){ startTimer(timeLeft); } else { document.getElementById("timer").innerText=""; }
-render();
+    showQuestion();
 }
 
-function render(){
-const q=quizQuestions[index];
-document.getElementById("progress").innerText=`Question ${index+1} of ${quizQuestions.length}`;
-document.getElementById("questionText").innerText=q.q;
-const box=document.getElementById("optionsBox"); box.innerHTML="";
-
-// Render options
-q.options.forEach((opt,i)=>{
-const div=document.createElement("div"); div.className="option"; div.innerText=opt;
-
-// Read Mode: highlight correct answer
-if(mode==="read" && i===q.answer) div.classList.add("correct");
-
-// Selected option
-if(answers[index]===i) div.classList.add("selected");
-
-// Solve All Mode: immediate feedback
-if((mode==="all") && answers[index]!==undefined){
-if(i===q.answer) div.classList.add("correct");
-if(i===answers[index] && answers[index]!==q.answer) div.classList.add("wrong");
+function showQuestion(){
+    let q = (selectedMode === 'all') ? questions[currentQuestion] : questions[currentQuestion];
+    document.getElementById('question-area').innerHTML = `<h2>${currentQuestion+1}. ${q.question}</h2>`;
+    let optionsHTML = '';
+    q.options.forEach((opt, idx) => {
+        optionsHTML += `<button onclick='selectAnswer(${idx})'>${opt}</button>`;
+    });
+    document.getElementById('options').innerHTML = optionsHTML;
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('submit-btn').style.display = 'block';
 }
 
-// Click handler
-div.onclick=()=>{
-if(mode==="read") return;
-if(mode==="all"){ answers[index]=i; render(); return; }
-answers[index]=i; render();
-};
-box.appendChild(div);
-});
+function selectAnswer(idx){
+    userAnswers[currentQuestion] = idx;
+    if(selectedMode === 'all'){
+        let buttons = document.getElementById('options').children;
+        for(let i=0;i<buttons.length;i++){
+            buttons[i].classList.remove('correct','wrong');
+            if(i === questions[currentQuestion].answer) buttons[i].classList.add('correct');
+        }
+        if(idx !== questions[currentQuestion].answer) buttons[idx].classList.add('wrong');
+        setTimeout(()=>{ nextQuestion(); }, 500);
+    }
 }
 
-function nextQ(){ if(index<quizQuestions.length-1){ index++; render(); } }
-function prevQ(){ if(index>0){ index--; render(); } }
-function goHome(){ clearInterval(timerInterval); document.getElementById("quizCard").style.display="none"; document.getElementById("resultCard").style.display="none"; document.getElementById("modeBox").style.display="grid"; }
-
-function startTimer(seconds){ timeLeft=seconds; updateTimer(); clearInterval(timerInterval); timerInterval=setInterval(()=>{ timeLeft--; updateTimer(); if(timeLeft<=0) submitQuiz(); },1000); }
-function updateTimer(){ const m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById("timer").innerText=`Time: ${m}:${s.toString().padStart(2,"0")}`; }
-function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+function nextQuestion(){
+    currentQuestion++;
+    if(currentQuestion >= questions.length || (selectedMode!== 'all' && currentQuestion >= selectedMode)){
+        submitQuiz();
+        return;
+    }
+    showQuestion();
+}
 
 function submitQuiz(){
-clearInterval(timerInterval);
-const total=quizQuestions.length;
-let correct=0;
-const resultDiv=document.getElementById("resultContent");
-resultDiv.innerHTML="";
-quizQuestions.forEach((q,i)=>{
-const user=answers[i];
-const div=document.createElement("div"); div.className="result-question";
-const qTitle=document.createElement("h3"); qTitle.innerText=`Q${i+1}: ${q.q}`; div.appendChild(qTitle);
-q.options.forEach((opt,j)=>{
-const p=document.createElement("p"); p.innerText=opt;
-if(j===q.answer) p.classList.add("correct-answer");
-if(user===j && user!==q.answer) p.classList.add("wrong-answer");
-div.appendChild(p);
-});
-if(user===q.answer) correct++;
-resultDiv.appendChild(div);
-});
-const scoreP=document.createElement("p");
-scoreP.style.fontSize="24px"; scoreP.style.fontWeight="700"; scoreP.style.marginTop="20px"; scoreP.style.textAlign="center";
-scoreP.innerText=`Your Score: ${correct}/${total} (${Math.round(correct/total*100)}%)`;
-resultDiv.prepend(scoreP);
-document.getElementById("quizCard").style.display="none";
-document.getElementById("resultCard").style.display="block";
+    clearInterval(timerInterval);
+    document.getElementById('quiz').style.display='none';
+    document.getElementById('result').style.display='block';
+    let score = 0;
+    userAnswers.forEach((ans, i)=>{
+        if(ans === questions[i].answer) score++;
+    });
+    document.getElementById('score').innerHTML = `You scored ${score} / ${selectedMode==='all'? questions.length : selectedMode} (${Math.round(score/(selectedMode==='all'? questions.length : selectedMode)*100)}%)`;
 }
-</script>
-</body>
+
+function goHome(){
+    document.getElementById('home').style.display='block';
+    document.getElementById('quiz').style.display='none';
+    document.getElementById('result').style.display='none';
+    clearInterval(timerInterval);
+    document.getElementById('timer').innerText='';
+}
+
+function startTimer(){
+    document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft/60)}:${timeLeft%60}`;
+    timerInterval = setInterval(()=>{
+        timeLeft--;
+        document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft/60)}:${timeLeft%60}`;
+        if(timeLeft<=0){
+            clearInterval(timerInterval);
+            submitQuiz();
+        }
+    },1000);
+}
+
+function startReadMode(){
+    selectedMode = 'read';
+    document.getElementById('home').style.display='none';
+    document.getElementById('quiz').style.display='block';
+    currentQuestion = 0;
+    userAnswers = [];
+    showReadQuestion();
+}
+
+function showReadQuestion(){
+    let q = questions[currentQuestion];
+    document.getElementById('question-area').innerHTML = `<h2>${currentQuestion+1}. ${q.question}</h2>`;
+    let optionsHTML = '';
+    q.options.forEach((opt, idx) => {
+        optionsHTML += `<button class='${idx===q.answer?'correct':''}'>${opt}</button>`;
+    });
+    document.getElementById('options').innerHTML = optionsHTML;
+    document.getElementById('next-btn').style.display='block';
+    document.getElementById('submit-btn').style.display='none';
+    currentQuestion++;
+}
+</script></body>
 </html>
