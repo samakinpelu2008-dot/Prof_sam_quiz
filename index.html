@@ -9,37 +9,39 @@ body{min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2);display
 .container{width:960px;padding:20px;}
 h1{color:#fff;text-align:center;margin-bottom:30px;}
 
+/* Mode Cards */
 .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:25px;}
 .mode-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:22px;padding:50px 20px;box-shadow:0 20px 40px rgba(0,0,0,0.25);cursor:pointer;transition:0.2s;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .mode-card:hover{transform:translateY(-5px);box-shadow:0 25px 50px rgba(0,0,0,0.35);}
 .mode-card h2{margin-bottom:10px;font-size:24px;}
 .mode-card p{font-size:14px;color:#e0e0ff;}
 
+/* Quiz & Question Card */
 .card{display:none;background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.25);animation:fade .3s ease;}
 @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
 #homeBtn{background:#667eea;color:#fff;padding:10px 15px;border:none;border-radius:12px;cursor:pointer;margin-bottom:20px;}
-
 .timer{float:right;font-size:14px;color:#555;}
 .progress{font-size:14px;color:#666;margin-bottom:15px;}
-.question{font-size:22px;font-weight:600;margin-bottom:20px;min-height:120px;padding:20px;background:#f2f4ff;border-radius:20px;}
-.options{display:grid;gap:12px;margin-bottom:15px;}
-.option{padding:16px;border-radius:14px;background:#f2f4ff;cursor:pointer;border:2px solid transparent;transition:.2s;}
-.option:hover{background:#e3e8ff;}
+.question{font-size:24px;font-weight:600;margin-bottom:20px;min-height:140px;padding:25px;background:#f2f4ff;border-radius:20px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+.options{display:grid;gap:14px;margin-bottom:15px;}
+.option{padding:18px;border-radius:16px;background:#f2f4ff;cursor:pointer;border:2px solid transparent;transition:.2s;font-size:18px;font-weight:500;}
+.option:hover{background:#e3e8ff;transform:translateY(-2px);}
 .option.selected{border-color:#667eea;}
 .option.correct{background:#d6f5dc;border-color:#2ecc71;}
-.option.wrong{background:#ffd6d6;border-color:#e74c3c;}
+.option.wrong{background:#ffd6d6;border-color:#e74c3c;opacity:0.85;}
 
+/* Navigation Buttons */
 .nav{display:flex;justify-content:space-between;margin-top:25px;}
-.nav button{padding:10px 18px;border-radius:12px;border:none;cursor:pointer;background:#667eea;color:#fff;}
+.nav button{padding:12px 20px;border-radius:12px;border:none;cursor:pointer;background:#667eea;color:#fff;font-size:16px;}
 .nav button:disabled{background:#ccc;}
 #timeSelect{margin-left:10px;padding:5px;border-radius:8px;}
-#submitBtn{background:#2ecc71;color:#fff;padding:10px 18px;border:none;border-radius:12px;cursor:pointer;margin-left:10px;}
+#submitBtn{background:#2ecc71;color:#fff;padding:12px 20px;border:none;border-radius:12px;cursor:pointer;margin-left:10px;font-size:16px;}
 
+/* Result Card */
 #resultCard{display:none;background:#fff;border-radius:22px;padding:40px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:center;}
-#resultCard h2{margin-bottom:20px;}
-#resultCard p{font-size:18px;margin-bottom:20px;}
-#resultCard button{padding:12px 20px;border-radius:12px;border:none;background:#667eea;color:#fff;cursor:pointer;}
+#resultCard h2{margin-bottom:20px;font-size:28px;color:#667eea;}
+#resultCard p{font-size:20px;margin-bottom:25px;font-weight:600;}
+#resultCard button{padding:14px 24px;border-radius:12px;border:none;background:#667eea;color:#fff;cursor:pointer;font-size:16px;}
 </style>
 </head>
 <body>
@@ -57,11 +59,9 @@ h1{color:#fff;text-align:center;margin-bottom:30px;}
 <!-- QUIZ CARD -->
 <div class="card" id="quizCard">
 <button id="homeBtn" onclick="goHome()">🏠 Home</button>
-
 <div style="margin-bottom:15px;">
 <span class="timer" id="timer"></span>
-<span>
-Set Timer: <select id="timeSelect">
+<span>Set Timer: <select id="timeSelect">
 <option value="5">5 min</option>
 <option value="10">10 min</option>
 <option value="15" selected>15 min</option>
@@ -70,7 +70,6 @@ Set Timer: <select id="timeSelect">
 <button id="submitBtn" onclick="submitQuiz()">Submit</button>
 </span>
 </div>
-
 <div class="progress" id="progress"></div>
 <div class="question" id="questionText"></div>
 <div class="options" id="optionsBox"></div>
@@ -89,23 +88,15 @@ Set Timer: <select id="timeSelect">
 
 <script>
 // ===== QUESTIONS =====
-const QUESTIONS = [
-{ q:"What is the largest planet in our solar system?",options:["Earth","Mars","Jupiter","Saturn"],answer:2 },
-{ q:"What is H2O commonly known as?",options:["Oxygen","Water","Hydrogen","Salt"],answer:1 },
-{ q:"Which animal is known as the 'King of the Jungle'?",options:["Lion","Tiger","Elephant","Giraffe"],answer:0 },
-{ q:"What is the square root of 64?",options:["6","8","10","12"],answer:1 },
-{ q:"Who wrote 'Romeo and Juliet'?",options:["Shakespeare","Dickens","Tolstoy","Hemingway"],answer:0 },
-{ q:"What is the chemical symbol for Gold?",options:["Au","Ag","Go","Gd"],answer:0 },
-{ q:"Which gas do plants release during photosynthesis?",options:["Oxygen","Carbon Dioxide","Nitrogen","Hydrogen"],answer:0 },
-{ q:"What is 12 × 12?",options:["144","121","124","142"],answer:0 },
-{ q:"Which continent is Egypt in?",options:["Asia","Europe","Africa","South America"],answer:2 },
-{ q:"Which planet is known as the Red Planet?",options:["Mars","Venus","Mercury","Jupiter"],answer:0 },
-{ q:"Who painted the Mona Lisa?",options:["Michelangelo","Van Gogh","Leonardo da Vinci","Picasso"],answer:2 },
-{ q:"What is the freezing point of water?",options:["0°C","100°C","-10°C","50°C"],answer:0 },
-{ q:"Which element has the symbol 'O'?",options:["Osmium","Oxygen","Gold","Iron"],answer:1 },
-{ q:"Which language is primarily spoken in Brazil?",options:["Spanish","English","Portuguese","French"],answer:2 },
-{ q:"Which ocean is the largest?",options:["Atlantic","Indian","Arctic","Pacific"],answer:3 }
-];
+// You can expand this to hundreds of questions
+const QUESTIONS = [];
+for(let i=1;i<=300;i++){
+QUESTIONS.push({
+q:`Sample Question ${i}?`,
+options:[`Option A${i}`,`Option B${i}`,`Option C${i}`,`Option D${i}`],
+answer: Math.floor(Math.random()*4)
+});
+}
 
 // ===== QUIZ ENGINE =====
 let mode="", quizQuestions=[], index=0, answers={}, timeLeft=0, timerInterval=null;
@@ -148,20 +139,28 @@ document.getElementById("questionText").innerText=q.q;
 const box=document.getElementById("optionsBox"); box.innerHTML="";
 q.options.forEach((opt,i)=>{
 const div=document.createElement("div"); div.className="option"; div.innerText=opt;
+
+// Highlight for Read Mode
 if(mode==="read" && i===q.answer) div.classList.add("correct");
+
+// Highlight for selected answers
 if(answers[index]!==undefined){
 if(i===q.answer) div.classList.add("correct");
 if(i===answers[index] && answers[index]!==q.answer) div.classList.add("wrong");
 if(answers[index]===i && i===q.answer) div.classList.add("correct");
 }
-div.onclick=()=>{ if(mode==="read") return; answers[index]=i; render(); };
+
+// Click handling
+div.onclick=()=>{
+if(mode==="read") return;
+answers[index]=i; render();
+};
 box.appendChild(div);
 });
 }
 
 function nextQ(){ if(index<quizQuestions.length-1){ index++; render(); } else { submitQuiz(); } }
 function prevQ(){ if(index>0){ index--; render(); } }
-
 function goHome(){ clearInterval(timerInterval); document.getElementById("quizCard").style.display="none"; document.getElementById("resultCard").style.display="none"; document.getElementById("modeBox").style.display="grid"; }
 
 function startTimer(seconds){ timeLeft=seconds; updateTimer(); timerInterval=setInterval(()=>{ timeLeft--; updateTimer(); if(timeLeft<=0) submitQuiz(); },1000); }
