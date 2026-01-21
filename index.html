@@ -5,27 +5,27 @@
 <title>Ultimate Quiz App</title>
 <style>
 *{box-sizing:border-box;font-family:"Segoe UI",sans-serif;margin:0;padding:0;}
-body{min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;align-items:flex-start;padding-top:20px;}
-.container{width:1000px;max-width:95%;padding:20px;}
+body{min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;padding:20px;}
+.container{width:1000px;max-width:95%;}
 
 /* Title */
 h1{color:#fff;text-align:center;margin-bottom:30px;font-size:36px;}
 
 /* Mode Cards */
 .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:25px;margin-bottom:40px;}
-.mode-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:22px;padding:50px 20px;box-shadow:0 20px 40px rgba(0,0,0,0.25);cursor:pointer;transition:0.2s;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.mode-card{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:22px;padding:60px 20px;box-shadow:0 20px 40px rgba(0,0,0,0.25);cursor:pointer;transition:0.2s;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .mode-card:hover{transform:translateY(-5px);box-shadow:0 25px 50px rgba(0,0,0,0.35);}
 .mode-card h2{margin-bottom:10px;font-size:28px;}
 .mode-card p{font-size:16px;color:#e0e0ff;}
 
-/* Quiz & Question Card */
+/* Quiz Card */
 .card{display:none;background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.25);}
 #homeBtn{background:#667eea;color:#fff;padding:12px 18px;border:none;border-radius:12px;cursor:pointer;margin-bottom:20px;font-size:16px;}
 .timer{float:right;font-size:18px;color:#555;font-weight:600;}
 .progress{font-size:16px;color:#666;margin-bottom:15px;}
-.question{font-size:28px;font-weight:700;margin-bottom:20px;min-height:250px;padding:25px;background:#f2f4ff;border-radius:20px;box-shadow:0 5px 15px rgba(0,0,0,0.1);} /* BIG question box */
-.options{display:grid;gap:16px;margin-bottom:15px;}
-.option{padding:20px;border-radius:16px;background:#f2f4ff;cursor:pointer;border:2px solid transparent;transition:.2s;font-size:20px;font-weight:500;}
+.question{font-size:28px;font-weight:700;margin-bottom:20px;min-height:250px;padding:30px;background:#f2f4ff;border-radius:20px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+.options{display:grid;gap:22px;margin-bottom:15px;}
+.option{padding:25px;border-radius:20px;background:#f2f4ff;cursor:pointer;border:2px solid transparent;transition:.2s;font-size:20px;font-weight:500;}
 .option:hover{background:#e3e8ff;transform:translateY(-2px);}
 .option.selected{border-color:#667eea;}
 .option.correct{background:#d6f5dc;border-color:#2ecc71;}
@@ -33,19 +33,23 @@ h1{color:#fff;text-align:center;margin-bottom:30px;font-size:36px;}
 
 /* Navigation Buttons */
 .nav{display:flex;justify-content:space-between;margin-top:25px;}
-.nav button{padding:14px 22px;border-radius:12px;border:none;cursor:pointer;background:#667eea;color:#fff;font-size:16px;}
+.nav button{padding:16px 24px;border-radius:12px;border:none;cursor:pointer;background:#667eea;color:#fff;font-size:18px;}
 .nav button:disabled{background:#ccc;}
 
 /* Timer Modal */
 #timerModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
-#timerModal .modal-content{background:#fff;border-radius:20px;padding:30px;max-width:400px;text-align:center;}
-#timerModal button{padding:12px 22px;border:none;border-radius:12px;margin:8px;background:#667eea;color:#fff;cursor:pointer;font-size:16px;}
+#timerModal .modal-content{background:#fff;border-radius:20px;padding:40px;max-width:450px;text-align:center;}
+#timerModal button{padding:14px 28px;border:none;border-radius:12px;margin:8px;background:#667eea;color:#fff;cursor:pointer;font-size:16px;}
 
 /* Result Card */
-#resultCard{display:none;background:#fff;border-radius:22px;padding:40px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:center;}
-#resultCard h2{margin-bottom:20px;font-size:32px;color:#667eea;}
-#resultCard p{font-size:22px;margin-bottom:25px;font-weight:600;}
-#resultCard button{padding:16px 28px;border-radius:12px;border:none;background:#667eea;color:#fff;cursor:pointer;font-size:18px;}
+#resultCard{display:none;background:#fff;border-radius:22px;padding:40px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:left;width:1000px;max-width:95%;max-height:90vh;overflow-y:auto;}
+#resultCard h2{margin-bottom:20px;font-size:32px;color:#667eea;text-align:center;}
+.result-question{margin-bottom:25px;padding:20px;border-radius:16px;background:#f2f4ff;}
+.result-question h3{margin-bottom:10px;font-size:20px;}
+.result-question p{font-size:18px;margin-bottom:8px;}
+.correct-answer{color:#2ecc71;font-weight:700;}
+.wrong-answer{color:#e74c3c;font-weight:700;}
+#resultCard button{padding:16px 28px;border-radius:12px;border:none;background:#667eea;color:#fff;cursor:pointer;font-size:18px;display:block;margin:0 auto;margin-top:25px;}
 </style>
 </head>
 <body>
@@ -97,7 +101,7 @@ h1{color:#fff;text-align:center;margin-bottom:30px;font-size:36px;}
 <!-- RESULT CARD -->
 <div class="card" id="resultCard">
 <h2>🎉 Quiz Completed!</h2>
-<p id="scoreText"></p>
+<div id="resultContent"></div>
 <button onclick="goHome()">🏠 Return Home</button>
 </div>
 
@@ -163,23 +167,23 @@ const box=document.getElementById("optionsBox"); box.innerHTML="";
 q.options.forEach((opt,i)=>{
 const div=document.createElement("div"); div.className="option"; div.innerText=opt;
 
-// Single choice enforcement
+// Read Mode: highlight correct answer
+if(mode==="read" && i===q.answer) div.classList.add("correct");
+
+// Selected option
 if(answers[index]===i) div.classList.add("selected");
 
-// Immediate feedback for Solve All / Read Mode
-if((mode==="all"||mode==="read") && answers[index]!==undefined){
+// Solve All Mode: immediate feedback
+if((mode==="all") && answers[index]!==undefined){
 if(i===q.answer) div.classList.add("correct");
 if(i===answers[index] && answers[index]!==q.answer) div.classList.add("wrong");
 }
 
 // Click handler
 div.onclick=()=>{
-if(mode==="read"||mode==="all"){
-answers[index]=i; render(); return;
-}
-// RANDOM 15/30: select only, single choice
-answers[index]=i;
-render(); // refresh selection highlight
+if(mode==="read") return;
+if(mode==="all"){ answers[index]=i; render(); return; }
+answers[index]=i; render();
 };
 box.appendChild(div);
 });
@@ -195,26 +199,29 @@ function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
 
 function submitQuiz(){
 clearInterval(timerInterval);
-// Calculate score
-let total=quizQuestions.length, correct=0;
-quizQuestions.forEach((q,i)=>{if(answers[i]===q.answer) correct++;});
-
-// Show result card
+const total=quizQuestions.length;
+let correct=0;
+const resultDiv=document.getElementById("resultContent");
+resultDiv.innerHTML="";
+quizQuestions.forEach((q,i)=>{
+const user=answers[i];
+const div=document.createElement("div"); div.className="result-question";
+const qTitle=document.createElement("h3"); qTitle.innerText=`Q${i+1}: ${q.q}`; div.appendChild(qTitle);
+q.options.forEach((opt,j)=>{
+const p=document.createElement("p"); p.innerText=opt;
+if(j===q.answer) p.classList.add("correct-answer");
+if(user===j && user!==q.answer) p.classList.add("wrong-answer");
+div.appendChild(p);
+});
+if(user===q.answer) correct++;
+resultDiv.appendChild(div);
+});
+const scoreP=document.createElement("p");
+scoreP.style.fontSize="24px"; scoreP.style.fontWeight="700"; scoreP.style.marginTop="20px"; scoreP.style.textAlign="center";
+scoreP.innerText=`Your Score: ${correct}/${total} (${Math.round(correct/total*100)}%)`;
+resultDiv.prepend(scoreP);
 document.getElementById("quizCard").style.display="none";
 document.getElementById("resultCard").style.display="block";
-document.getElementById("scoreText").innerText=`Your Score: ${correct}/${total} (${Math.round(correct/total*100)}%)`;
-
-// Highlight all correct answers for Random 15/30 after submit
-if(mode==="random15"||mode==="random30"){
-const box=document.getElementById("optionsBox");
-quizQuestions.forEach((q,i)=>{
-const opts=box.children;
-for(let j=0;j<opts.length;j++){
-opts[j].classList.remove("selected");
-if(j===q.answer) opts[j].classList.add("correct");
-}
-});
-}
 }
 </script>
 </body>
