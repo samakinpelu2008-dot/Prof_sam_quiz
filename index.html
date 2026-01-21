@@ -1,67 +1,177 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Quiz App</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f2f5; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; color: #333; }
-        .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .options button { display: block; width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background-color: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
-        .options button.correct { background-color: #28a745; }
-        .options button.wrong { background-color: #dc3545; }
-        .options button:hover { opacity: 0.9; }
-        #timer { font-size: 18px; margin-bottom: 20px; text-align: center; }
-        #submit-btn, #next-btn, #start-btn, #home-btn { padding: 12px 25px; font-size: 16px; border-radius: 10px; border: none; cursor: pointer; margin-top: 15px; }
-        #submit-btn { background-color: #28a745; color: #fff; }
-        #next-btn { background-color: #007bff; color: #fff; }
-        #start-btn { background-color: #17a2b8; color: #fff; }
-        #home-btn { background-color: #ffc107; color: #333; }
-        .result-card { text-align: center; font-size: 20px; }
-        select { padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; margin-top: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Quiz App</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f5f6fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        width: 100%;
+        background: #4e73df;
+        color: white;
+        padding: 1rem;
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    .card {
+        width: 90%;
+        max-width: 900px;
+        margin: 1rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    #question-text {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .option-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 0.8rem 1rem;
+        margin: 0.5rem 0;
+        border: 2px solid #4e73df;
+        border-radius: 10px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .option-btn:hover {
+        background: #f1f1f1;
+    }
+
+    .correct { background: #28a745 !important; color: white; }
+    .wrong { background: #dc3545 !important; color: white; }
+
+    .btn-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: white;
+        background: #4e73df;
+        transition: 0.3s;
+    }
+
+    .btn:hover { background: #2e59d9; }
+
+    #timer {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    #result {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+</style>
 </head>
 <body>
-<div class="container">
-    <h1>Ultimate Quiz App</h1>
-    <div id="home" class="card">
-        <p>Select Mode:</p>
-        <button onclick="startQuiz(15)">15 Questions</button>
-        <button onclick="startQuiz(30)">30 Questions</button>
-        <button onclick="startQuiz('all')">Solve All</button>
-        <button onclick="startReadMode()">Read Mode</button>
-        <div>
-            <label>Set Timer (mins): </label>
-            <select id="timer-select">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15" selected>15</option>
-                <option value="20">20</option>
-            </select>
-        </div>
-    </div><div id="quiz" class="card" style="display:none;">
+
+<header>Ultimate Quiz App</header>
+
+<div class="card" id="home-card">
+    <h2>Select Mode</h2>
+    <button class="btn" onclick="startQuiz('15')">15 Questions</button>
+    <button class="btn" onclick="startQuiz('30')">30 Questions</button>
+    <button class="btn" onclick="startQuiz('all')">Solve All</button>
+    <button class="btn" onclick="startReadMode()">Read Mode</button>
+</div>
+
+<div class="card" id="quiz-card" style="display:none;">
     <div id="timer"></div>
-    <div id="question-area"></div>
-    <div class="options" id="options"></div>
-    <button id="next-btn" onclick="nextQuestion()" style="display:none;">Next</button>
-    <button id="submit-btn" onclick="submitQuiz()">Submit</button>
-    <button id="home-btn" onclick="goHome()">Home</button>
+    <div id="question-text"></div>
+    <div id="options"></div>
+    <div class="btn-container">
+        <button class="btn" onclick="prevQuestion()">Previous</button>
+        <button class="btn" onclick="nextQuestion()">Next</button>
+        <button class="btn" onclick="submitQuiz()">Submit</button>
+        <button class="btn" onclick="backHome()">Home</button>
+    </div>
 </div>
 
-<div id="result" class="card" style="display:none;">
-    <div class="result-card" id="score"></div>
-    <button onclick="goHome()" id="home-btn">Back to Home</button>
+<div class="card" id="result-card" style="display:none;">
+    <div id="result"></div>
+    <button class="btn" onclick="backHome()">Back to Home</button>
 </div>
 
-</div><script>
-let questions = [
-{question: "The major role of WBCs is", options: ["vasodilation", "transport of digested food", "combacting infections", "none"], answer: 2},
-{question: "The organ responsible for the destruction of platelet is", options: ["spleen", "heart", "kidney", "tissues"], answer: 0},
-{question: "One of the following is not a waste product of metabolism", options: ["urea", "faeces", "water", "CO₂"], answer: 1},
-{question: "Gaseous exchange in plants is through stomata and", options: ["cambium", "cuticle", "lenticels", "epidermis"], answer: 2},
-{question: "Which of these is not an event occurring during interphase", options: ["Organelles duplication", "DNA replication", "chromosome separation", "DNA repair"], answer: 2},
-// ... Add all 110 questions here using the format above ...
+<script>
+// ================== QUESTIONS ARRAY ===================
+const questions = [
+{
+    question: "The major role of WBCs is",
+    options: ["vasodilation","transport of digested food","combacting infections","none"],
+    answer: 2
+},
+{
+    question: "The organ responsible for the destruction of platelet is",
+    options: ["spleen","heart","kidney","tissues"],
+    answer: 0
+},
+{
+    question: "One of the following is not a waste product of metabolism",
+    options: ["urea","faeces","water","CO₂"],
+    answer: 1
+},
+{
+    question: "Gaseous exchange in plants is through stomata and",
+    options: ["cambium","cuticle","lenticels","epidermis"],
+    answer: 2
+},
+{
+    question: "Which of these is not an event occurring during interphase",
+    options: ["Organelles duplication","DNA replication","chromosome separation","DNA repair"],
+    answer: 2
+},
+{
+    question: "Throughout prophase, chromatins tend to",
+    options: ["separate","multiply","dissolve","condense"],
+    answer: 3
+},
+{
+    question: "The upper and lower surfaces of the epidermis of leaves contain certain pores called which are openings to the outside of leaves",
+    options: ["holes","stomata","stomata and lenticels","filament"],
+    answer: 1
+},
+{
+    question: "The most abundant mineral ion in the blood plasma is",
+    options: ["K⁺","Na⁺","Ca²⁺","Mg²⁺"],
+    answer: 1
+},
+{
+    question: "Arrange the events that occur when the solute concentration in the guard cell increases sequentially (1) water enters the guard cell from the adjacent epidermal cells (2) tugor pressure increases (3) the stomata opens (4) the water potential of the guard cell reduces",
+    options: ["3,1,4,2","2,3,4,1","1,2,3,4","4,1,2,3"],
+    answer: 3
+},
+{
+    question: "The point at which two sister chromatids join together is called",
+    options: ["joint","centriole","centromere","centrosome"],
+    answer: 2
+},
+// ... ADD ALL YOUR 110+ QUESTIONS HERE FOLLOWING SAME FORMAT
 {question: "The major role of WBCs is", options: ["vasodilation","transport of digested food","combacting infections","none"], answer: 2},
 {question: "The organ responsible for the destruction of platelet is", options: ["spleen","heart","kidney","tissues"], answer: 0},
 {question: "One of the following is not a waste product of metabolism", options: ["urea","faeces","water","CO₂"], answer: 1},
@@ -175,113 +285,121 @@ let questions = [
 {question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2}
 ];
 
+// ============== VARIABLES ==================
 let currentQuestion = 0;
-let userAnswers = [];
-let selectedMode = 0;
+let selectedMode = "";
+let quizLength = 0;
 let timerInterval;
-let timeLeft = 0;
+let remainingTime = 0;
+let userAnswers = [];
 
-function startQuiz(mode){
+// ================== FUNCTIONS =====================
+function startQuiz(mode) {
     selectedMode = mode;
-    document.getElementById('home').style.display = 'none';
-    document.getElementById('quiz').style.display = 'block';
     currentQuestion = 0;
-    userAnswers = [];
+    userAnswers = new Array(questions.length).fill(null);
+    if(mode === '15') quizLength = 15;
+    else if(mode === '30') quizLength = 30;
+    else quizLength = questions.length;
 
-    if(mode !== 'all'){
-        let timerSelect = document.getElementById('timer-select');
-        timeLeft = parseInt(timerSelect.value) * 60;
-        startTimer();
+    // Show timer only for 15/30
+    if(mode === '15' || mode === '30'){
+        let minutes = prompt("Select Time (5,10,15,20 minutes):");
+        remainingTime = parseInt(minutes) * 60;
+        updateTimer();
+        timerInterval = setInterval(updateTimer,1000);
+    } else {
+        document.getElementById("timer").style.display = 'none';
     }
 
-    showQuestion();
+    document.getElementById("home-card").style.display = 'none';
+    document.getElementById("quiz-card").style.display = 'block';
+    showQuestion(currentQuestion);
 }
 
-function showQuestion(){
-    let q = (selectedMode === 'all') ? questions[currentQuestion] : questions[currentQuestion];
-    document.getElementById('question-area').innerHTML = `<h2>${currentQuestion+1}. ${q.question}</h2>`;
-    let optionsHTML = '';
-    q.options.forEach((opt, idx) => {
-        optionsHTML += `<button onclick='selectAnswer(${idx})'>${opt}</button>`;
-    });
-    document.getElementById('options').innerHTML = optionsHTML;
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('submit-btn').style.display = 'block';
-}
-
-function selectAnswer(idx){
-    userAnswers[currentQuestion] = idx;
-    if(selectedMode === 'all'){
-        let buttons = document.getElementById('options').children;
-        for(let i=0;i<buttons.length;i++){
-            buttons[i].classList.remove('correct','wrong');
-            if(i === questions[currentQuestion].answer) buttons[i].classList.add('correct');
-        }
-        if(idx !== questions[currentQuestion].answer) buttons[idx].classList.add('wrong');
-        setTimeout(()=>{ nextQuestion(); }, 500);
-    }
-}
-
-function nextQuestion(){
-    currentQuestion++;
-    if(currentQuestion >= questions.length || (selectedMode!== 'all' && currentQuestion >= selectedMode)){
+function updateTimer() {
+    let min = Math.floor(remainingTime/60);
+    let sec = remainingTime%60;
+    document.getElementById("timer").innerText = `Time Left: ${min}m ${sec}s`;
+    remainingTime--;
+    if(remainingTime<0) {
+        clearInterval(timerInterval);
         submitQuiz();
-        return;
     }
-    showQuestion();
+}
+
+function showQuestion(index) {
+    const q = questions[index];
+    document.getElementById("question-text").innerText = `${index+1}. ${q.question}`;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+    q.options.forEach((opt,i)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = ()=>selectAnswer(index,i);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function selectAnswer(qIndex,optIndex){
+    userAnswers[qIndex] = optIndex;
+}
+
+function nextQuestion() {
+    if(currentQuestion < quizLength-1){
+        currentQuestion++;
+        showQuestion(currentQuestion);
+    }
+}
+
+function prevQuestion() {
+    if(currentQuestion>0){
+        currentQuestion--;
+        showQuestion(currentQuestion);
+    }
 }
 
 function submitQuiz(){
     clearInterval(timerInterval);
-    document.getElementById('quiz').style.display='none';
-    document.getElementById('result').style.display='block';
     let score = 0;
-    userAnswers.forEach((ans, i)=>{
-        if(ans === questions[i].answer) score++;
-    });
-    document.getElementById('score').innerHTML = `You scored ${score} / ${selectedMode==='all'? questions.length : selectedMode} (${Math.round(score/(selectedMode==='all'? questions.length : selectedMode)*100)}%)`;
+    for(let i=0;i<quizLength;i++){
+        if(userAnswers[i] === questions[i].answer) score++;
+    }
+    document.getElementById("quiz-card").style.display = 'none';
+    document.getElementById("result-card").style.display = 'block';
+    document.getElementById("result").innerText = `Score: ${score} / ${quizLength}\nPercentage: ${((score/quizLength)*100).toFixed(2)}%`;
 }
 
-function goHome(){
-    document.getElementById('home').style.display='block';
-    document.getElementById('quiz').style.display='none';
-    document.getElementById('result').style.display='none';
-    clearInterval(timerInterval);
-    document.getElementById('timer').innerText='';
-}
-
-function startTimer(){
-    document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft/60)}:${timeLeft%60}`;
-    timerInterval = setInterval(()=>{
-        timeLeft--;
-        document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft/60)}:${timeLeft%60}`;
-        if(timeLeft<=0){
-            clearInterval(timerInterval);
-            submitQuiz();
-        }
-    },1000);
+function backHome(){
+    document.getElementById("quiz-card").style.display = 'none';
+    document.getElementById("result-card").style.display = 'none';
+    document.getElementById("home-card").style.display = 'block';
 }
 
 function startReadMode(){
+    alert("Read mode: You can navigate questions and see answers highlighted.");
     selectedMode = 'read';
-    document.getElementById('home').style.display='none';
-    document.getElementById('quiz').style.display='block';
     currentQuestion = 0;
-    userAnswers = [];
-    showReadQuestion();
+    document.getElementById("home-card").style.display = 'none';
+    document.getElementById("quiz-card").style.display = 'block';
+    showReadQuestion(currentQuestion);
 }
 
-function showReadQuestion(){
-    let q = questions[currentQuestion];
-    document.getElementById('question-area').innerHTML = `<h2>${currentQuestion+1}. ${q.question}</h2>`;
-    let optionsHTML = '';
-    q.options.forEach((opt, idx) => {
-        optionsHTML += `<button class='${idx===q.answer?'correct':''}'>${opt}</button>`;
+function showReadQuestion(index){
+    const q = questions[index];
+    document.getElementById("question-text").innerText = `${index+1}. ${q.question}`;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+    q.options.forEach((opt,i)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        if(i===q.answer) btn.classList.add("correct");
+        optionsDiv.appendChild(btn);
     });
-    document.getElementById('options').innerHTML = optionsHTML;
-    document.getElementById('next-btn').style.display='block';
-    document.getElementById('submit-btn').style.display='none';
-    currentQuestion++;
 }
-</script></body>
+</script>
+
+</body>
 </html>
