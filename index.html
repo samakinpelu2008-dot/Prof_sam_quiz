@@ -3,123 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Quiz App</title>
+<title>Quiz App</title>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: #f5f6fa;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#eef2ff;
+}
 
-    header {
-        width: 100%;
-        background: #4e73df;
-        color: white;
-        padding: 1rem;
-        text-align: center;
-        font-size: 1.5rem;
-    }
+header{
+    background:#3b5bdb;
+    color:white;
+    padding:20px;
+    text-align:center;
+    font-size:24px;
+}
 
-    .card {
-        width: 90%;
-        max-width: 900px;
-        margin: 1rem auto;
-        padding: 2rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
+.hidden{display:none}
 
-    #question-text {
-        font-size: 1.3rem;
-        margin-bottom: 1.5rem;
-    }
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
 
-    .option-btn {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 0.8rem 1rem;
-        margin: 0.5rem 0;
-        border: 2px solid #4e73df;
-        border-radius: 10px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+.card{
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
 
-    .option-btn:hover {
-        background: #f1f1f1;
-    }
+/* BIG QUESTION CARD */
+#questionBox{
+    font-size:22px;
+    min-height:200px;
+    margin-bottom:30px;
+}
 
-    .correct { background: #28a745 !important; color: white; }
-    .wrong { background: #dc3545 !important; color: white; }
+.option{
+    padding:15px;
+    margin:10px 0;
+    border-radius:15px;
+    border:2px solid #3b5bdb;
+    cursor:pointer;
+    font-size:18px;
+}
 
-    .btn-container {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 1rem;
-    }
+.option:hover{background:#f1f3ff}
 
-    .btn {
-        padding: 0.8rem 1.5rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1rem;
-        color: white;
-        background: #4e73df;
-        transition: 0.3s;
-    }
+.correct{background:#2f9e44;color:white}
+.wrong{background:#e03131;color:white}
 
-    .btn:hover { background: #2e59d9; }
+.controls{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+}
 
-    #timer {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        color: #333;
-    }
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    background:#3b5bdb;
+    color:white;
+    cursor:pointer;
+}
 
-    #result {
-        font-size: 1.4rem;
-        text-align: center;
-    }
+button:hover{background:#2b4acb}
+
+#timer{
+    font-size:20px;
+    margin-bottom:10px;
+}
+
+/* FULL RESULT PAGE */
+#resultPage{
+    text-align:center;
+    font-size:22px;
+}
 </style>
 </head>
 <body>
 
-<header>Ultimate Quiz App</header>
+<header>Quiz App</header>
 
-<div class="card" id="home-card">
+<div class="container">
+
+<!-- HOME -->
+<div class="card" id="home">
     <h2>Select Mode</h2>
-    <button class="btn" onclick="startQuiz('15')">15 Questions</button>
-    <button class="btn" onclick="startQuiz('30')">30 Questions</button>
-    <button class="btn" onclick="startQuiz('all')">Solve All</button>
-    <button class="btn" onclick="startReadMode()">Read Mode</button>
+
+    <p>Choose Time:</p>
+    <select id="timeSelect">
+        <option value="300">5 Minutes</option>
+        <option value="600">10 Minutes</option>
+        <option value="900">15 Minutes</option>
+        <option value="1200">20 Minutes</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="startQuiz(15)">15 Questions</button>
+    <button onclick="startQuiz(30)">30 Questions</button>
+    <button onclick="startQuiz('all')">Solve All</button>
+    <button onclick="startRead()">Read Mode</button>
 </div>
 
-<div class="card" id="quiz-card" style="display:none;">
+<!-- QUIZ -->
+<div class="card hidden" id="quiz">
     <div id="timer"></div>
-    <div id="question-text"></div>
-    <div id="options"></div>
-    <div class="btn-container">
-        <button class="btn" onclick="prevQuestion()">Previous</button>
-        <button class="btn" onclick="nextQuestion()">Next</button>
-        <button class="btn" onclick="submitQuiz()">Submit</button>
-        <button class="btn" onclick="backHome()">Home</button>
+    <div id="questionBox"></div>
+    <div id="optionsBox"></div>
+
+    <div class="controls">
+        <button onclick="prev()">Previous</button>
+        <button onclick="next()">Next</button>
+        <button onclick="submitQuiz()">Submit</button>
+        <button onclick="goHome()">Home</button>
     </div>
 </div>
 
-<div class="card" id="result-card" style="display:none;">
-    <div id="result"></div>
-    <button class="btn" onclick="backHome()">Back to Home</button>
+<!-- RESULT -->
+<div class="card hidden" id="resultPage">
+    <h2>Result</h2>
+    <p id="scoreText"></p>
+    <button onclick="goHome()">Back Home</button>
+</div>
+
 </div>
 
 <script>
-// ================== QUESTIONS ARRAY ===================
+/* ===========================
+   👉👉👉 PUT YOUR QUESTIONS HERE 👈👈👈
+   FORMAT MUST BE EXACTLY LIKE THIS
+=========================== */
+
 const questions = [
 {
     question: "The major role of WBCs is",
@@ -171,7 +192,6 @@ const questions = [
     options: ["joint","centriole","centromere","centrosome"],
     answer: 2
 },
-// ... ADD ALL YOUR 110+ QUESTIONS HERE FOLLOWING SAME FORMAT
 {question: "The major role of WBCs is", options: ["vasodilation","transport of digested food","combacting infections","none"], answer: 2},
 {question: "The organ responsible for the destruction of platelet is", options: ["spleen","heart","kidney","tissues"], answer: 0},
 {question: "One of the following is not a waste product of metabolism", options: ["urea","faeces","water","CO₂"], answer: 1},
@@ -285,121 +305,118 @@ const questions = [
 {question: "Which of the following is not part of life span of blood thrombocytes", options: ["5","9","3","6"], answer: 2}
 ];
 
-// ============== VARIABLES ==================
-let currentQuestion = 0;
-let selectedMode = "";
-let quizLength = 0;
-let timerInterval;
-let remainingTime = 0;
-let userAnswers = [];
+/* ===========================
+   ENGINE (DON'T TOUCH)
+=========================== */
 
-// ================== FUNCTIONS =====================
-function startQuiz(mode) {
-    selectedMode = mode;
-    currentQuestion = 0;
-    userAnswers = new Array(questions.length).fill(null);
-    if(mode === '15') quizLength = 15;
-    else if(mode === '30') quizLength = 30;
-    else quizLength = questions.length;
+let mode, quizQuestions=[], index=0, score=0, timer, timeLeft;
+let showInstant=false, readMode=false;
+let answers=[];
 
-    // Show timer only for 15/30
-    if(mode === '15' || mode === '30'){
-        let minutes = prompt("Select Time (5,10,15,20 minutes):");
-        remainingTime = parseInt(minutes) * 60;
-        updateTimer();
-        timerInterval = setInterval(updateTimer,1000);
-    } else {
-        document.getElementById("timer").style.display = 'none';
+const home=document.getElementById("home");
+const quiz=document.getElementById("quiz");
+const resultPage=document.getElementById("resultPage");
+const questionBox=document.getElementById("questionBox");
+const optionsBox=document.getElementById("optionsBox");
+const timerBox=document.getElementById("timer");
+
+function startQuiz(m){
+    mode=m;
+    readMode=false;
+    showInstant=(m==="all");
+    quizQuestions = m==="all" ? [...questions] : shuffle([...questions]).slice(0,m);
+    answers=new Array(quizQuestions.length).fill(null);
+    index=0; score=0;
+
+    if(m!=="all"){
+        timeLeft=parseInt(document.getElementById("timeSelect").value);
+        startTimer();
+    }else{
+        timerBox.innerHTML="";
     }
 
-    document.getElementById("home-card").style.display = 'none';
-    document.getElementById("quiz-card").style.display = 'block';
-    showQuestion(currentQuestion);
+    home.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    load();
 }
 
-function updateTimer() {
-    let min = Math.floor(remainingTime/60);
-    let sec = remainingTime%60;
-    document.getElementById("timer").innerText = `Time Left: ${min}m ${sec}s`;
-    remainingTime--;
-    if(remainingTime<0) {
-        clearInterval(timerInterval);
-        submitQuiz();
-    }
+function startRead(){
+    readMode=true;
+    quizQuestions=[...questions];
+    index=0;
+    home.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    timerBox.innerHTML="READ MODE";
+    load();
 }
 
-function showQuestion(index) {
-    const q = questions[index];
-    document.getElementById("question-text").innerText = `${index+1}. ${q.question}`;
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-    q.options.forEach((opt,i)=>{
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        btn.onclick = ()=>selectAnswer(index,i);
-        optionsDiv.appendChild(btn);
+function load(){
+    let q=quizQuestions[index];
+    questionBox.innerHTML=`<b>Q${index+1}.</b> ${q.q}`;
+    optionsBox.innerHTML="";
+    q.o.forEach((opt,i)=>{
+        let div=document.createElement("div");
+        div.className="option";
+        div.innerText=opt;
+        div.onclick=()=>select(i,div);
+        if(readMode && i===q.a) div.classList.add("correct");
+        optionsBox.appendChild(div);
     });
 }
 
-function selectAnswer(qIndex,optIndex){
-    userAnswers[qIndex] = optIndex;
-}
+function select(i,el){
+    if(readMode) return;
 
-function nextQuestion() {
-    if(currentQuestion < quizLength-1){
-        currentQuestion++;
-        showQuestion(currentQuestion);
+    answers[index]=i;
+
+    if(showInstant){
+        let correct=quizQuestions[index].a;
+        document.querySelectorAll(".option").forEach((o,j)=>{
+            if(j===correct) o.classList.add("correct");
+            if(j===i && i!==correct) o.classList.add("wrong");
+        });
     }
 }
 
-function prevQuestion() {
-    if(currentQuestion>0){
-        currentQuestion--;
-        showQuestion(currentQuestion);
-    }
-}
+function next(){ if(index<quizQuestions.length-1){ index++; load(); } }
+function prev(){ if(index>0){ index--; load(); } }
 
 function submitQuiz(){
-    clearInterval(timerInterval);
-    let score = 0;
-    for(let i=0;i<quizLength;i++){
-        if(userAnswers[i] === questions[i].answer) score++;
+    clearInterval(timer);
+    score=0;
+    quizQuestions.forEach((q,i)=>{ if(answers[i]===q.a) score++; });
+    quiz.classList.add("hidden");
+    resultPage.classList.remove("hidden");
+    let total=quizQuestions.length;
+    let percent=Math.round((score/total)*100);
+    document.getElementById("scoreText").innerHTML=
+        `Score: ${score} / ${total}<br>Percentage: ${percent}%`;
+}
+
+function goHome(){
+    clearInterval(timer);
+    quiz.classList.add("hidden");
+    resultPage.classList.add("hidden");
+    home.classList.remove("hidden");
+}
+
+function startTimer(){
+    timerBox.innerHTML=`Time: ${timeLeft}s`;
+    timer=setInterval(()=>{
+        timeLeft--;
+        timerBox.innerHTML=`Time: ${timeLeft}s`;
+        if(timeLeft<=0) submitQuiz();
+    },1000);
+}
+
+function shuffle(a){
+    for(let i=a.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
     }
-    document.getElementById("quiz-card").style.display = 'none';
-    document.getElementById("result-card").style.display = 'block';
-    document.getElementById("result").innerText = `Score: ${score} / ${quizLength}\nPercentage: ${((score/quizLength)*100).toFixed(2)}%`;
-}
-
-function backHome(){
-    document.getElementById("quiz-card").style.display = 'none';
-    document.getElementById("result-card").style.display = 'none';
-    document.getElementById("home-card").style.display = 'block';
-}
-
-function startReadMode(){
-    alert("Read mode: You can navigate questions and see answers highlighted.");
-    selectedMode = 'read';
-    currentQuestion = 0;
-    document.getElementById("home-card").style.display = 'none';
-    document.getElementById("quiz-card").style.display = 'block';
-    showReadQuestion(currentQuestion);
-}
-
-function showReadQuestion(index){
-    const q = questions[index];
-    document.getElementById("question-text").innerText = `${index+1}. ${q.question}`;
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-    q.options.forEach((opt,i)=>{
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        if(i===q.answer) btn.classList.add("correct");
-        optionsDiv.appendChild(btn);
-    });
+    return a;
 }
 </script>
 
 </body>
-</html>
+    </html>
